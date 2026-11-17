@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Моя страница — крестики-нолики</title>
+  <meta name="description" content="Личная страница с мини-игрой крестики-нолики.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <section class="profile">
+      <div class="avatar-wrap">
+        <img class="avatar" src="assets/avatar.svg" alt="Фото человека" width="180" height="180">
+      </div>
+      <h1 class="name">Александр</h1>
+      <p class="tagline">Добро пожаловать на мою страницу 👋</p>
+      <p class="about">Люблю простые вещи: хороший дизайн, музыку и маленькие игры. Ниже можно сыграть партию.</p>
+      <div class="links">
+        <a class="link-btn" href="#game">Играть</a>
+        <a class="link-btn ghost" href="mailto:hello@example.com">Написать</a>
+      </div>
+    </section>
+
+    <section class="game" id="game">
+      <h2 class="game-title">Крестики-нолики</h2>
+      <p class="game-sub">Ты играешь за <span class="x-mark">X</span>, компьютер — за <span class="o-mark">O</span></p>
+
+      <div class="board" id="board" role="grid" aria-label="Игровое поле 3 на 3">
+        <button class="cell" data-index="0" aria-label="Клетка 1"></button>
+        <button class="cell" data-index="1" aria-label="Клетка 2"></button>
+        <button class="cell" data-index="2" aria-label="Клетка 3"></button>
+        <button class="cell" data-index="3" aria-label="Клетка 4"></button>
+        <button class="cell" data-index="4" aria-label="Клетка 5"></button>
+        <button class="cell" data-index="5" aria-label="Клетка 6"></button>
+        <button class="cell" data-index="6" aria-label="Клетка 7"></button>
+        <button class="cell" data-index="7" aria-label="Клетка 8"></button>
+        <button class="cell" data-index="8" aria-label="Клетка 9"></button>
+      </div>
+
+      <p class="status" id="status">Твой ход</p>
+
+      <div class="score">
+        <div class="score-item">
+          <span class="score-label">Ты</span>
+          <span class="score-value" id="score-player">0</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Ничьи</span>
+          <span class="score-value" id="score-draw">0</span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">Компьютер</span>
+          <span class="score-value" id="score-ai">0</span>
+        </div>
+      </div>
+
+      <button class="reset" id="reset" type="button">Новая игра</button>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Сделано с ❤️</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
