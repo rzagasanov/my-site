@@ -22,11 +22,11 @@
     { id: "galaxy", icon: "🌌", name: "Галактика", desc: "Целая вселенная в кармане", price: 27000 },
     { id: "temple", icon: "🏛️", name: "Храм", desc: "Памятник твоему труду", price: 65000 },
     { id: "end", icon: "💫", name: "Сингулярность", desc: "Конец бесконечности", price: 150000 },
-    { id: "fedya", photo: "assets/fedya.jpg", name: "Федя", desc: "Первый из легенд", price: 500000 },
-    { id: "adilet", photo: "assets/adilet.jpg", name: "Адилет", desc: "Редкий экспонат", price: 500000 },
-    { id: "rza", photo: "assets/rza.jpg", name: "Рза", desc: "Тот самый Рза", price: 500000 },
-    { id: "sabir", photo: "assets/sabir.jpg", name: "Сабир", desc: "Хранитель коллекции", price: 500000 },
-    { id: "vugar", photo: "assets/vugar.jpg", name: "Вугар", desc: "Финальный трофей", price: 500000 },
+    { id: "fedya", photo: "assets/fedya.jpg", name: "Федя", desc: "Первый из легенд", price: 5000000000 },
+    { id: "adilet", photo: "assets/adilet.jpg", name: "Адилет", desc: "Редкий экспонат", price: 5000000000 },
+    { id: "rza", photo: "assets/rza.jpg", name: "Рза", desc: "Тот самый Рза", price: 5000000000 },
+    { id: "sabir", photo: "assets/sabir.jpg", name: "Сабир", desc: "Хранитель коллекции", price: 5000000000 },
+    { id: "vugar", photo: "assets/vugar.jpg", name: "Вугар", desc: "Финальный трофей", price: 5000000000 },
     { id: "r_coffee", photo: "assets/items/coffee.jpg", name: "Чашка кофе", desc: "С чего начинается день", price: 500 },
     { id: "r_sneakers", photo: "assets/items/sneakers.jpg", name: "Кроссовки", desc: "Бегом за деньгами", price: 2500 },
     { id: "r_iphone", photo: "assets/items/iphone.png", name: "iPhone", desc: "Всегда на связи", price: 15000 },
@@ -42,6 +42,9 @@
     { id: "r_asteroid", photo: "assets/items/asteroid.jpg", name: "Астероид", desc: "Небесное тело твоё", price: 950000000 },
     { id: "r_sun", photo: "assets/items/sun.jpg", name: "Солнце", desc: "Всё освещает тебе", price: 1000000000 },
   ];
+
+  // По возрастанию цены
+  ITEMS.sort((a, b) => a.price - b.price);
 
   const STOCKS = [
     { id: "apple", name: "Apple", ticker: "AAPL", logo: "assets/logos/apple.png", base: 420, vol: 0.06 },
@@ -91,8 +94,10 @@
   if (!el.coin) return;
 
   function fresh() {
-    return { coins: 0, total: 0, taps: 0, crits: 0, owned: {}, items: {}, stocks: {}, business: {} };
+    return { coins: 0, total: 0, taps: 0, crits: 0, owned: {}, items: {}, stocks: {}, business: {}, migrated5b: true };
   }
+
+  const PEOPLE_CONFISCATE = ["fedya", "adilet", "rza", "sabir", "vugar"];
 
   function load() {
     const base = fresh();
@@ -100,7 +105,7 @@
       const raw = localStorage.getItem(KEY);
       if (!raw) return base;
       const saved = JSON.parse(raw);
-      return {
+      const result = {
         coins: Number(saved.coins) || 0,
         total: Number(saved.total) || 0,
         taps: Number(saved.taps) || 0,
@@ -109,7 +114,22 @@
         items: saved.items && typeof saved.items === "object" ? saved.items : {},
         stocks: saved.stocks && typeof saved.stocks === "object" ? saved.stocks : {},
         business: saved.business && typeof saved.business === "object" ? saved.business : {},
+        migrated5b: saved.migrated5b === true,
       };
+      // Разовая конфискация 5 людей: изначально они стоили слишком дёшево.
+      // Дальше не повторяется — купленные заново останутся.
+      if (!result.migrated5b) {
+        PEOPLE_CONFISCATE.forEach((id) => {
+          delete result.items[id];
+        });
+        result.migrated5b = true;
+        try {
+          localStorage.setItem(KEY, JSON.stringify(result));
+        } catch (error) {
+          /* игнорируем */
+        }
+      }
+      return result;
     } catch (error) {
       return base;
     }
