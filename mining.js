@@ -1196,6 +1196,7 @@
   }
 
   function closeGiftModal() {
+    if (el.giftOverlay.contains(document.activeElement)) document.activeElement.blur();
     giftTarget = null;
     el.giftOverlay.classList.remove("show");
     el.giftOverlay.setAttribute("aria-hidden", "true");
@@ -1331,6 +1332,7 @@
   }
 
   function closeAuthModal() {
+    if (el.nickOverlay.contains(document.activeElement)) document.activeElement.blur();
     el.nickOverlay.classList.remove("show");
     el.nickOverlay.setAttribute("aria-hidden", "true");
   }
