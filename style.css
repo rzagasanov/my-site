@@ -463,6 +463,93 @@ body {
   display: block;
 }
 
+.pay-grid {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 14px;
+}
+
+.pay-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.pay-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(94, 231, 255, 0.45);
+  background: rgba(30, 42, 66, 0.85);
+}
+
+.pay-card:active {
+  transform: translateY(0);
+}
+
+.pay-icon {
+  width: 30px;
+  flex: 0 0 30px;
+  font-size: 24px;
+  line-height: 1;
+  text-align: center;
+}
+
+.pay-body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pay-body b {
+  font-size: 14px;
+}
+
+.pay-body small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.pay-cta {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.pay-off {
+  opacity: 0.62;
+}
+
+.pay-off .pay-cta {
+  color: var(--muted);
+}
+
+.pay-note {
+  padding: 11px 12px;
+  border-left: 2px solid var(--accent-2);
+  border-radius: 8px;
+  background: rgba(167, 139, 250, 0.08);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.pay-note b {
+  color: var(--text);
+}
+
 .difficulty {
   display: flex;
   align-items: center;
