@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Моя страница — игры и музыка</title>
   <meta name="description" content="Фото, любимая музыка, крестики-нолики и майнинг токенов.">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
   <main class="page">
@@ -142,7 +142,10 @@
           </div>
 
           <div class="shop-view active" id="shop-buffs"></div>
-          <div class="shop-view" id="shop-stocks"></div>
+          <div class="shop-view" id="shop-stocks">
+            <div class="stocks-summary" id="stocks-summary"></div>
+            <div id="stock-list"></div>
+          </div>
           <div class="shop-view" id="shop-business"></div>
           <div class="shop-view item-grid" id="shop-collection"></div>
 
@@ -168,8 +171,15 @@
     <div class="haram-sub">Все деньги конфискованы</div>
   </div>
 
-  <script src="script.js?v=7"></script>
-  <script src="player.js?v=7"></script>
-  <script src="mining.js?v=7"></script>
+  <div class="manage-overlay" id="manage-overlay" aria-hidden="true">
+    <div class="manage-modal">
+      <button class="manage-close" id="manage-close" type="button" aria-label="Закрыть">✕</button>
+      <div id="manage-content"></div>
+    </div>
+  </div>
+
+  <script src="script.js?v=8"></script>
+  <script src="player.js?v=8"></script>
+  <script src="mining.js?v=8"></script>
 </body>
 </html>

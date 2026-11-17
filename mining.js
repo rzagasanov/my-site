@@ -46,28 +46,58 @@
   // По возрастанию цены
   ITEMS.sort((a, b) => a.price - b.price);
 
+  // cap — капитализация, shares — всего акций, supply — сколько лежит на рынке.
+  // Цена одной акции = кап / акции. Кап от 50 млн до 25 млрд.
   const STOCKS = [
-    { id: "apple", name: "Apple", ticker: "AAPL", logo: "assets/logos/apple.png", base: 420, vol: 0.06 },
-    { id: "tesla", name: "Tesla", ticker: "TSLA", logo: "assets/logos/tesla.png", base: 780, vol: 0.09 },
-    { id: "nvidia", name: "NVIDIA", ticker: "NVDA", logo: "assets/logos/nvidia.png", base: 1250, vol: 0.08 },
-    { id: "google", name: "Google", ticker: "GOOG", logo: "assets/logos/google.png", base: 610, vol: 0.05 },
-    { id: "amazon", name: "Amazon", ticker: "AMZN", logo: "assets/logos/amazon.png", base: 890, vol: 0.06 },
-    { id: "microsoft", name: "Microsoft", ticker: "MSFT", logo: "assets/logos/microsoft.png", base: 730, vol: 0.05 },
-    { id: "coca", name: "Coca-Cola", ticker: "KO", logo: "assets/logos/coca.png", base: 180, vol: 0.04 },
-    { id: "mcd", name: "McDonald's", ticker: "MCD", logo: "assets/logos/mcd.png", base: 260, vol: 0.04 },
-    { id: "visa", name: "Visa", ticker: "V", logo: "assets/logos/visa.png", base: 540, vol: 0.05 },
-    { id: "samsung", name: "Samsung", ticker: "SSNLF", logo: "assets/logos/samsung.png", base: 320, vol: 0.06 },
+    { id: "coca", name: "Coca-Cola", ticker: "KO", logo: "assets/logos/coca.png", cap: 50000000, shares: 100000000, supply: 20000, vol: 0.05 },
+    { id: "mcd", name: "McDonald's", ticker: "MCD", logo: "assets/logos/mcd.png", cap: 120000000, shares: 60000000, supply: 12000, vol: 0.06 },
+    { id: "samsung", name: "Samsung", ticker: "SSNLF", logo: "assets/logos/samsung.png", cap: 500000000, shares: 100000000, supply: 10000, vol: 0.07 },
+    { id: "visa", name: "Visa", ticker: "V", logo: "assets/logos/visa.png", cap: 1200000000, shares: 120000000, supply: 8000, vol: 0.06 },
+    { id: "google", name: "Google", ticker: "GOOG", logo: "assets/logos/google.png", cap: 2400000000, shares: 120000000, supply: 6000, vol: 0.07 },
+    { id: "amazon", name: "Amazon", ticker: "AMZN", logo: "assets/logos/amazon.png", cap: 3500000000, shares: 100000000, supply: 5000, vol: 0.07 },
+    { id: "microsoft", name: "Microsoft", ticker: "MSFT", logo: "assets/logos/microsoft.png", cap: 5000000000, shares: 100000000, supply: 4000, vol: 0.06 },
+    { id: "tesla", name: "Tesla", ticker: "TSLA", logo: "assets/logos/tesla.png", cap: 7500000000, shares: 150000000, supply: 3000, vol: 0.09 },
+    { id: "nvidia", name: "NVIDIA", ticker: "NVDA", logo: "assets/logos/nvidia.png", cap: 12000000000, shares: 120000000, supply: 2500, vol: 0.08 },
+    { id: "apple", name: "Apple", ticker: "AAPL", logo: "assets/logos/apple.png", cap: 25000000000, shares: 100000000, supply: 2000, vol: 0.06 },
+  ];
+
+  // Режим цены товаров влияет и на прибыль, и на рост курса.
+  const GOODS_MODES = [
+    { name: "Низкая", income: 0.5, growth: 0.65 },
+    { name: "Средняя", income: 1, growth: 1 },
+    { name: "Высокая", income: 2, growth: 0.85 },
+    { name: "Премиум", income: 4, growth: 0.6 },
+  ];
+
+  const CONTROLS = [
+    { id: "ad", icon: "📢", name: "Реклама", desc: "Курс растёт быстрее", max: 5, price: 0.0004 },
+    { id: "div", icon: "💰", name: "Дивиденды", desc: "Доход с каждой акции", max: 5, price: 0.0005 },
+    { id: "rnd", icon: "🔬", name: "Исследования", desc: "Рост капитализации", max: 5, price: 0.0006 },
+    { id: "tax", icon: "🧾", name: "Оптимизация налогов", desc: "Больше прибыли", max: 3, price: 0.0008 },
+  ];
+
+  // Бизнес: до 5 точек каждого вида, у каждой свои настройки (не как у акций).
+  const BIZ_MAX = 5;
+  const BIZ_PRICES = [
+    { name: "Эконом", mult: 0.7, desc: "Дешевле, но меньше прибыли" },
+    { name: "Стандарт", mult: 1, desc: "Обычная цена" },
+    { name: "Люкс", mult: 1.8, desc: "Дорого, но прибыльнее" },
+  ];
+  const BIZ_UPGRADES = [
+    { id: "manager", icon: "🧑‍💼", name: "Менеджер", desc: "+25% к доходу точки", max: 5, price: 0.00006 },
+    { id: "equip", icon: "🔧", name: "Оборудование", desc: "+40% к доходу точки", max: 5, price: 0.0001 },
+    { id: "supply", icon: "🚚", name: "Поставщики", desc: "+12% за счёт экономии", max: 3, price: 0.00015 },
   ];
 
   const BUSINESS = [
-    { id: "stall", icon: "🥤", name: "Ларёк", desc: "+2 ₿ в секунду", base: 1000, growth: 1.5, income: 2 },
-    { id: "cafe", icon: "☕", name: "Кафе", desc: "+15 ₿ в секунду", base: 10000, growth: 1.5, income: 15 },
-    { id: "shop", icon: "🏪", name: "Магазин", desc: "+120 ₿ в секунду", base: 100000, growth: 1.5, income: 120 },
-    { id: "mall", icon: "🏬", name: "Торговый центр", desc: "+1 000 ₿ в секунду", base: 1000000, growth: 1.5, income: 1000 },
-    { id: "factory", icon: "🏭", name: "Завод", desc: "+8 000 ₿ в секунду", base: 10000000, growth: 1.5, income: 8000 },
-    { id: "oil", icon: "🛢️", name: "Нефтекомпания", desc: "+60 000 ₿ в секунду", base: 100000000, growth: 1.5, income: 60000 },
-    { id: "bank", icon: "🏦", name: "Банк", desc: "+250 000 ₿ в секунду", base: 500000000, growth: 1.5, income: 250000 },
-    { id: "corp", icon: "🌐", name: "Корпорация", desc: "+1 000 000 ₿ в секунду", base: 1000000000, growth: 1.5, income: 1000000 },
+    { id: "stall", icon: "🥤", name: "Ларёк", desc: "Маленькая точка с большим потоком", base: 5000, growth: 1.5, income: 10 },
+    { id: "cafe", icon: "☕", name: "Кафе", desc: "Кофе и выручка каждый день", base: 50000, growth: 1.5, income: 120 },
+    { id: "shop", icon: "🏪", name: "Магазин", desc: "Полноценная торговля", base: 500000, growth: 1.5, income: 1500 },
+    { id: "mall", icon: "🏬", name: "Торговый центр", desc: "Много арендаторов сразу", base: 5000000, growth: 1.5, income: 20000 },
+    { id: "factory", icon: "🏭", name: "Завод", desc: "Своё производство", base: 50000000, growth: 1.5, income: 250000 },
+    { id: "oil", icon: "🛢️", name: "Нефтекомпания", desc: "Чёрное золото идёт в гору", base: 500000000, growth: 1.5, income: 3000000 },
+    { id: "bank", icon: "🏦", name: "Банк", desc: "Проценты со всего города", base: 2500000000, growth: 1.5, income: 15000000 },
+    { id: "corp", icon: "🌐", name: "Корпорация", desc: "Глобальная сеть компаний", base: 10000000000, growth: 1.5, income: 60000000 },
   ];
 
   const el = {
@@ -85,16 +115,24 @@
     shelf: document.getElementById("shelf"),
     shelfCount: document.getElementById("collection-count"),
     reset: document.getElementById("mine-reset"),
-    stocks: document.getElementById("shop-stocks"),
+    stocks: document.getElementById("stock-list"),
+    stocksSummary: document.getElementById("stocks-summary"),
     business: document.getElementById("shop-business"),
     loan: document.getElementById("loan-btn"),
     overlay: document.getElementById("haram-overlay"),
+    manageOverlay: document.getElementById("manage-overlay"),
+    manageContent: document.getElementById("manage-content"),
+    manageClose: document.getElementById("manage-close"),
   };
 
   if (!el.coin) return;
 
   function fresh() {
-    return { coins: 0, total: 0, taps: 0, crits: 0, owned: {}, items: {}, stocks: {}, business: {}, migrated5b: true };
+    return {
+      coins: 0, total: 0, taps: 0, crits: 0,
+      owned: {}, items: {}, stocks: {}, business: {},
+      market: {}, control: {}, bizUp: {}, migrated5b: true,
+    };
   }
 
   const PEOPLE_CONFISCATE = ["fedya", "adilet", "rza", "sabir", "vugar"];
@@ -114,6 +152,9 @@
         items: saved.items && typeof saved.items === "object" ? saved.items : {},
         stocks: saved.stocks && typeof saved.stocks === "object" ? saved.stocks : {},
         business: saved.business && typeof saved.business === "object" ? saved.business : {},
+        market: saved.market && typeof saved.market === "object" ? saved.market : {},
+        control: saved.control && typeof saved.control === "object" ? saved.control : {},
+        bizUp: saved.bizUp && typeof saved.bizUp === "object" ? saved.bizUp : {},
         migrated5b: saved.migrated5b === true,
       };
       // Разовая конфискация 5 людей: изначально они стоили слишком дёшево.
@@ -140,9 +181,14 @@
 
   const stockPrices = {};
   const stockPrev = {};
+  const qtyDraft = {};
+  const pushCooldown = {};
+  let manageId = null;
+  let manageKind = null;
   STOCKS.forEach((stock) => {
-    stockPrices[stock.id] = stock.base;
-    stockPrev[stock.id] = stock.base;
+    const start = stock.cap / stock.shares;
+    stockPrices[stock.id] = start;
+    stockPrev[stock.id] = start;
   });
 
   function saveNow() {
@@ -165,7 +211,8 @@
     if (value >= 1e9) return (value / 1e9).toFixed(2) + "B";
     if (value >= 1e6) return (value / 1e6).toFixed(2) + "M";
     if (value >= 1e3) return (value / 1e3).toFixed(2) + "K";
-    if (value < 100) return String(Math.round(value * 10) / 10).replace(".", ",");
+    if (value < 1) return value.toFixed(2).replace(".", ",");
+    if (value < 100) return value.toFixed(1).replace(".", ",");
     return Math.floor(value).toLocaleString("ru-RU");
   }
 
@@ -182,8 +229,9 @@
     });
     BUSINESS.forEach((item) => {
       const count = save.business[item.id] || 0;
-      if (count) sec += item.income * count;
+      if (count) sec += businessIncome(item, count);
     });
+    sec += dividendsIncome();
     return { tap: tap * mult, sec: sec * mult };
   }
 
@@ -262,20 +310,64 @@
   function renderBusiness() {
     el.business.innerHTML = BUSINESS.map((item) => {
       const count = save.business[item.id] || 0;
+      const maxed = count >= BIZ_MAX;
       const cost = businessCost(item);
-      const can = save.coins >= cost;
+      const can = !maxed && save.coins >= cost;
+      const income = businessIncome(item, count);
       return (
-        '<button class="shop-item' + (can ? " can" : "") + '" type="button" data-biz="' + item.id + '">' +
+        '<div class="biz-card' + (can ? " can" : "") + '">' +
+        '<button class="biz-buy" type="button" data-biz="' + item.id + '"' + (maxed ? " disabled" : "") + ">" +
         '<span class="si-icon">' + item.icon + "</span>" +
         '<span class="si-body"><b>' + item.name + "</b><small>" + item.desc + "</small>" +
-        "<em>Куплено: " + count + "</em></span>" +
-        '<span class="si-price">' + fmt(cost) + " ₿</span>" +
-        "</button>"
+        "<em>Точек: " + count + " / " + BIZ_MAX + " · +" + fmt(income) + " ₿/сек</em>" +
+        (count >= BIZ_MAX ? '<span class="biz-franchise">🏆 Франшиза ×1.5</span>' : "") +
+        "</span>" +
+        '<span class="si-price">' + (maxed ? "МАКС" : fmt(cost) + " ₿") + "</span>" +
+        "</button>" +
+        '<button class="biz-setup" type="button" data-biz-setup="' + item.id + '"' + (count ? "" : " disabled") + ">⚙️ Настроить</button>" +
+        "</div>"
       );
     }).join("");
   }
 
-  function renderStocks() {
+  function marketLeft(stock) {
+    const saved = save.market[stock.id];
+    return saved === undefined ? stock.supply : Math.max(0, Number(saved) || 0);
+  }
+
+  function capNow(stock) {
+    return stockPrices[stock.id] * stock.shares;
+  }
+
+  function defaultControl() {
+    return { ad: 0, div: 0, rnd: 0, tax: 0, goods: 1 };
+  }
+
+  function controlOf(id) {
+    return save.control[id] || null;
+  }
+
+  function controlCost(stock, config, level) {
+    return Math.ceil((stock.cap * config.price * Math.pow(level + 1, 1.6)) / 5) * 5;
+  }
+
+  function pushCost(stock) {
+    return Math.max(5, Math.round(stockPrices[stock.id] * 8));
+  }
+
+  function dividendsIncome() {
+    let total = 0;
+    STOCKS.forEach((stock) => {
+      const ctl = controlOf(stock.id);
+      const held = save.stocks[stock.id];
+      if (!ctl || !ctl.div || !held || !held.qty) return;
+      const goods = GOODS_MODES[ctl.goods] || GOODS_MODES[1];
+      total += stockPrices[stock.id] * ctl.div * 0.002 * held.qty * goods.income * (1 + ctl.tax * 0.15);
+    });
+    return total;
+  }
+
+  function renderSummary() {
     let value = 0;
     let cost = 0;
     let qty = 0;
@@ -287,31 +379,207 @@
       cost += held.avg * held.qty;
     });
     const profit = value - cost;
-
-    el.stocks.innerHTML =
-      '<div class="stocks-summary">' +
+    el.stocksSummary.innerHTML =
       "<span>В портфеле: <b>" + qty + "</b> акций</span>" +
       "<span>Стоимость: <b>" + fmt(value) + " ₿</b></span>" +
       '<span class="' + (profit >= 0 ? "up" : "down") + '">' + (profit >= 0 ? "+" : "") + fmt(profit) + " ₿</span>" +
+      "<span>Дивиденды: <b>+" + fmt(dividendsIncome()) + " ₿/сек</b></span>";
+  }
+
+  function deltaText(stock) {
+    const price = stockPrices[stock.id];
+    const previous = stockPrev[stock.id] || price;
+    const delta = ((price - previous) / previous) * 100;
+    return '<small class="' + (delta >= 0 ? "up" : "down") + '">' + (delta >= 0 ? "▲" : "▼") + " " + Math.abs(delta).toFixed(1) + "%</small>";
+  }
+
+  function renderStocks() {
+    renderSummary();
+    el.stocks.innerHTML = STOCKS.map((stock) => {
+      const price = stockPrices[stock.id];
+      const held = save.stocks[stock.id];
+      const heldQty = held ? held.qty : 0;
+      const left = marketLeft(stock);
+      const controlled = Boolean(controlOf(stock.id));
+      const draft = qtyDraft[stock.id] === undefined ? 1 : qtyDraft[stock.id];
+      return (
+        '<div class="stock-card" data-card="' + stock.id + '">' +
+        '<img class="stock-logo" src="' + stock.logo + '" alt="' + stock.name + '">' +
+        '<div class="stock-info"><b>' + stock.name + "</b><small>" + stock.ticker + " · у тебя " + heldQty + "</small></div>" +
+        '<div class="stock-price"><b>' + fmt(price) + " ₿</b>" + deltaText(stock) + "</div>" +
+        '<div class="stock-meta"><span>Кап: <b class="cap-text">' + fmt(capNow(stock)) + " ₿</b></span>" +
+        '<span class="market-text">' + (left ? "На рынке: " + fmt(left) : "Рынок выкуплен") + "</span></div>" +
+        '<div class="stock-trade">' +
+        '<input class="stock-qty" type="number" min="1" step="1" inputmode="numeric" value="' + draft + '" data-qty="' + stock.id + '" aria-label="Количество">' +
+        '<button type="button" data-act="max" data-id="' + stock.id + '">Макс</button>' +
+        '<button class="buy" type="button" data-act="buy" data-id="' + stock.id + '">Купить</button>' +
+        '<button type="button" data-act="sell" data-id="' + stock.id + '"' + (heldQty ? "" : " disabled") + ">Продать</button>" +
+        "</div>" +
+        '<div class="stock-actions">' +
+        '<button type="button" data-act="up" data-id="' + stock.id + '">📈 Поднять ' + fmt(pushCost(stock)) + "</button>" +
+        '<button type="button" data-act="down" data-id="' + stock.id + '">📉 Опустить ' + fmt(pushCost(stock)) + "</button>" +
+        (controlled
+          ? '<button class="manage" type="button" data-act="manage" data-id="' + stock.id + '">🏛 Управление</button>'
+          : "") +
+        "</div></div>"
+      );
+    }).join("");
+  }
+
+  // Тик обновляет только цифры — чтобы поле ввода не сбрасывалось во время набора.
+  function tickStocks() {
+    renderSummary();
+    STOCKS.forEach((stock) => {
+      const card = el.stocks.querySelector('[data-card="' + stock.id + '"]');
+      if (!card) return;
+      card.querySelector(".stock-price b").textContent = fmt(stockPrices[stock.id]) + " ₿";
+      card.querySelector(".stock-price small").outerHTML = deltaText(stock);
+      card.querySelector(".cap-text").textContent = fmt(capNow(stock)) + " ₿";
+    });
+    if (manageId) renderManage();
+  }
+
+  function bizUpOf(id) {
+    return save.bizUp[id] || { manager: 0, equip: 0, supply: 0, price: 1 };
+  }
+
+  function bizUpgradeCost(item, config, level) {
+    return Math.ceil((item.base * config.price * Math.pow(level + 1, 1.7)) / 5) * 5;
+  }
+
+  function businessIncome(item, count) {
+    const up = bizUpOf(item.id);
+    const mode = BIZ_PRICES[up.price] || BIZ_PRICES[1];
+    const manager = 1 + (up.manager || 0) * 0.25;
+    const equip = 1 + (up.equip || 0) * 0.4;
+    const supply = 1 + (up.supply || 0) * 0.12;
+    const franchise = count >= BIZ_MAX ? 1.5 : 1;
+    return item.income * count * mode.mult * manager * equip * supply * franchise;
+  }
+
+  function openManage(kind, id) {
+    manageKind = kind;
+    manageId = id;
+    el.manageOverlay.classList.add("show");
+    el.manageOverlay.setAttribute("aria-hidden", "false");
+    renderManage();
+  }
+
+  function closeManage() {
+    manageKind = null;
+    manageId = null;
+    el.manageOverlay.classList.remove("show");
+    el.manageOverlay.setAttribute("aria-hidden", "true");
+  }
+
+  function renderManage() {
+    if (!manageId) return;
+    if (manageKind === "stock") renderStockManage();
+    else renderBizManage();
+  }
+
+  function levelBar(level, max) {
+    let out = "";
+    for (let i = 0; i < max; i++) out += '<i class="' + (i < level ? "on" : "") + '"></i>';
+    return '<span class="mg-bar">' + out + "</span>";
+  }
+
+  function renderStockManage() {
+    const stock = STOCKS.find((entry) => entry.id === manageId);
+    if (!stock) return closeManage();
+    const ctl = controlOf(stock.id) || defaultControl();
+    const held = save.stocks[stock.id];
+    const heldQty = held ? held.qty : 0;
+    const goods = GOODS_MODES[ctl.goods] || GOODS_MODES[1];
+    const buybackCost = Math.ceil((capNow(stock) * 0.002) / 5) * 5;
+    const sellGain = Math.ceil((capNow(stock) * 0.4) / 5) * 5;
+
+    el.manageContent.innerHTML =
+      '<div class="manage-head">' +
+      '<img src="' + stock.logo + '" alt="' + stock.name + '">' +
+      "<div><h3>" + stock.name + "</h3><small>" + stock.ticker + " · ты контролируешь компанию</small></div>" +
       "</div>" +
-      STOCKS.map((stock) => {
-        const price = stockPrices[stock.id];
-        const previous = stockPrev[stock.id] || price;
-        const delta = ((price - previous) / previous) * 100;
-        const held = save.stocks[stock.id];
-        const heldQty = held ? held.qty : 0;
+      '<div class="manage-stats">' +
+      "<span>Капитализация: <b>" + fmt(capNow(stock)) + " ₿</b></span>" +
+      "<span>Цена акции: <b>" + fmt(stockPrices[stock.id]) + " ₿</b></span>" +
+      "<span>Твои акции: <b>" + heldQty + "</b></span>" +
+      "<span>Дивиденды: <b>+" + fmt(dividendsIncome()) + " ₿/сек</b></span>" +
+      "</div>" +
+      "<h4>📢 Управление ростом</h4>" +
+      '<div class="mg-grid">' +
+      CONTROLS.map((config) => {
+        const level = ctl[config.id] || 0;
+        const maxed = level >= config.max;
+        const cost = controlCost(stock, config, level);
+        const can = !maxed && save.coins >= cost;
         return (
-          '<div class="stock-card">' +
-          '<img class="stock-logo" src="' + stock.logo + '" alt="' + stock.name + '">' +
-          '<div class="stock-info"><b>' + stock.name + "</b><small>" + stock.ticker + " · у тебя " + heldQty + "</small></div>" +
-          '<div class="stock-price"><b>' + fmt(price) + " ₿</b>" +
-          '<small class="' + (delta >= 0 ? "up" : "down") + '">' + (delta >= 0 ? "▲" : "▼") + " " + Math.abs(delta).toFixed(1) + "%</small></div>" +
-          '<div class="stock-actions">' +
-          '<button type="button" data-buy="' + stock.id + '">Купить</button>' +
-          '<button type="button" data-sell="' + stock.id + '"' + (heldQty ? "" : " disabled") + ">Продать</button>" +
-          "</div></div>"
+          '<button type="button" class="mg-item' + (can ? " can" : "") + '" data-mg="stock-up" data-key="' + config.id + '"' + (maxed ? " disabled" : "") + ">" +
+          '<span class="mg-icon">' + config.icon + "</span>" +
+          "<b>" + config.name + "</b><small>" + config.desc + "</small>" +
+          levelBar(level, config.max) +
+          "<em>" + (maxed ? "МАКСИМУМ" : fmt(cost) + " ₿") + "</em>" +
+          "</button>"
         );
-      }).join("");
+      }).join("") +
+      "</div>" +
+      "<h4>🏷️ Цена товаров</h4>" +
+      '<div class="mg-modes">' +
+      GOODS_MODES.map((mode, index) =>
+        '<button type="button" class="' + (ctl.goods === index ? "active" : "") + '" data-mg="stock-goods" data-mode="' + index + '">' +
+        mode.name + "<small>прибыль ×" + mode.income + " · рост ×" + mode.growth + "</small></button>"
+      ).join("") +
+      "</div>" +
+      '<p class="mg-note">Сейчас: <b>' + goods.name + "</b>. Высокая цена даёт больше дивидендов, но замедляет рост курса.</p>" +
+      '<div class="mg-extra">' +
+      '<button type="button" data-mg="buyback"' + (save.coins < buybackCost ? " disabled" : "") + ">♻️ Выкупить акции · " + fmt(buybackCost) + " ₿<small>Курс +10%</small></button>" +
+      '<button type="button" class="danger" data-mg="sell-company">💼 Продать контроль · +' + fmt(sellGain) + " ₿<small>Рынок снова открыт</small></button>" +
+      "</div>";
+  }
+
+  function renderBizManage() {
+    const item = BUSINESS.find((entry) => entry.id === manageId);
+    if (!item) return closeManage();
+    const up = bizUpOf(item.id);
+    const count = save.business[item.id] || 0;
+    const mode = BIZ_PRICES[up.price] || BIZ_PRICES[1];
+    const income = businessIncome(item, count);
+
+    el.manageContent.innerHTML =
+      '<div class="manage-head biz">' +
+      '<span class="mg-biz-icon">' + item.icon + "</span>" +
+      "<div><h3>" + item.name + "</h3><small>Точек: " + count + " / " + BIZ_MAX + " · " + item.desc + "</small></div>" +
+      "</div>" +
+      '<div class="manage-stats">' +
+      "<span>Доход: <b>+" + fmt(income) + " ₿/сек</b></span>" +
+      "<span>Ценовая политика: <b>" + mode.name + "</b></span>" +
+      "<span>Франшиза: <b>" + (count >= BIZ_MAX ? "🏆 активна ×1.5" : count + " / " + BIZ_MAX) + "</b></span>" +
+      "</div>" +
+      "<h4>🧑‍💼 Улучшение точек</h4>" +
+      '<div class="mg-grid">' +
+      BIZ_UPGRADES.map((config) => {
+        const level = up[config.id] || 0;
+        const maxed = level >= config.max;
+        const cost = bizUpgradeCost(item, config, level);
+        const can = !maxed && save.coins >= cost && count > 0;
+        return (
+          '<button type="button" class="mg-item' + (can ? " can" : "") + '" data-mg="biz-up" data-key="' + config.id + '"' + (maxed || !count ? " disabled" : "") + ">" +
+          '<span class="mg-icon">' + config.icon + "</span>" +
+          "<b>" + config.name + "</b><small>" + config.desc + "</small>" +
+          levelBar(level, config.max) +
+          "<em>" + (maxed ? "МАКСИМУМ" : fmt(cost) + " ₿") + "</em>" +
+          "</button>"
+        );
+      }).join("") +
+      "</div>" +
+      "<h4>🏷️ Ценовая политика</h4>" +
+      '<div class="mg-modes">' +
+      BIZ_PRICES.map((priceMode, index) =>
+        '<button type="button" class="' + (up.price === index ? "active" : "") + '" data-mg="biz-price" data-mode="' + index + '">' +
+        priceMode.name + "<small>" + priceMode.desc + " · ×" + priceMode.mult + "</small></button>"
+      ).join("") +
+      "</div>" +
+      '<p class="mg-note">Улучшения действуют на все точки этого бизнеса. Купи 5 точек — включится франшиза с бонусом ×1.5.</p>' +
+      '<div class="mg-extra"><button type="button" class="danger" data-mg="biz-close">Готово</button></div>';
   }
 
   function renderAll() {
@@ -378,56 +646,225 @@
     saveNow();
   });
 
-  el.stocks.addEventListener("click", (event) => {
-    const buyBtn = event.target.closest("[data-buy]");
-    const sellBtn = event.target.closest("[data-sell]");
+  el.stocks.addEventListener("input", (event) => {
+    const input = event.target.closest("[data-qty]");
+    if (!input) return;
+    qtyDraft[input.dataset.qty] = input.value;
+  });
 
-    if (buyBtn) {
-      const stock = STOCKS.find((item) => item.id === buyBtn.dataset.buy);
-      if (!stock) return;
-      const price = stockPrices[stock.id];
-      if (save.coins < price) {
-        shake(buyBtn);
+  el.stocks.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-act]");
+    if (!button) return;
+    const stock = STOCKS.find((item) => item.id === button.dataset.id);
+    if (!stock) return;
+    const act = button.dataset.act;
+    const input = el.stocks.querySelector('[data-qty="' + stock.id + '"]');
+    const readQty = () => {
+      const raw = input ? parseInt(input.value, 10) : 1;
+      return Math.max(1, Math.min(1000000, Number.isFinite(raw) ? raw : 1));
+    };
+    const startPrice = stock.cap / stock.shares;
+    const clamp = (value) => Math.max(startPrice * 0.3, Math.min(startPrice * 3.5, value));
+
+    if (act === "max") {
+      const left = marketLeft(stock);
+      const affordable = Math.floor(save.coins / stockPrices[stock.id]);
+      qtyDraft[stock.id] = Math.max(1, Math.min(left, affordable));
+      renderStocks();
+      return;
+    }
+
+    if (act === "buy") {
+      const left = marketLeft(stock);
+      const qty = Math.min(readQty(), left);
+      const unit = stockPrices[stock.id];
+      const cost = unit * qty;
+      if (qty < 1 || save.coins < cost) {
+        shake(button);
         return;
       }
-      save.coins -= price;
+      save.coins -= cost;
       const held = save.stocks[stock.id] || { qty: 0, avg: 0 };
-      held.avg = (held.avg * held.qty + price) / (held.qty + 1);
-      held.qty += 1;
+      held.avg = (held.avg * held.qty + cost) / (held.qty + qty);
+      held.qty += qty;
       save.stocks[stock.id] = held;
+      const remaining = left - qty;
+      save.market[stock.id] = remaining;
+      // Крупная покупка поднимает курс.
+      stockPrices[stock.id] = clamp(unit * (1 + (qty / stock.supply) * 0.15));
+      if (remaining === 0 && !save.control[stock.id]) {
+        save.control[stock.id] = defaultControl();
+      }
       renderAll();
       saveNow();
       return;
     }
 
-    if (sellBtn) {
-      const stock = STOCKS.find((item) => item.id === sellBtn.dataset.sell);
-      if (!stock) return;
+    if (act === "sell") {
       const held = save.stocks[stock.id];
-      if (!held || held.qty < 1) {
-        shake(sellBtn);
+      const qty = Math.min(readQty(), held ? held.qty : 0);
+      if (qty < 1) {
+        shake(button);
         return;
       }
-      save.coins += stockPrices[stock.id];
-      held.qty -= 1;
+      const unit = stockPrices[stock.id];
+      save.coins += unit * qty;
+      held.qty -= qty;
       if (!held.qty) delete save.stocks[stock.id];
+      stockPrices[stock.id] = clamp(unit * (1 - (qty / stock.supply) * 0.08));
       renderAll();
       saveNow();
+      return;
     }
+
+    if (act === "up" || act === "down") {
+      if (pushCooldown[stock.id] && Date.now() - pushCooldown[stock.id] < 2500) {
+        shake(button);
+        return;
+      }
+      const cost = pushCost(stock);
+      if (save.coins < cost) {
+        shake(button);
+        return;
+      }
+      save.coins -= cost;
+      const swing = 0.03 + Math.random() * 0.04;
+      stockPrices[stock.id] = clamp(stockPrices[stock.id] * (act === "up" ? 1 + swing : 1 - swing));
+      pushCooldown[stock.id] = Date.now();
+      renderAll();
+      saveNow();
+      return;
+    }
+
+    if (act === "manage") openManage("stock", stock.id);
+  });
+
+  el.manageClose.addEventListener("click", closeManage);
+  el.manageOverlay.addEventListener("click", (event) => {
+    if (event.target === el.manageOverlay) closeManage();
+    const button = event.target.closest("[data-mg]");
+    if (!button) return;
+    const mg = button.dataset.mg;
+    const id = manageId;
+    if (!id) return;
+
+    if (mg === "stock-up") {
+      const stock = STOCKS.find((entry) => entry.id === id);
+      const config = CONTROLS.find((entry) => entry.id === button.dataset.key);
+      if (!stock || !config) return;
+      const ctl = controlOf(id) || defaultControl();
+      const level = ctl[config.id] || 0;
+      if (level >= config.max) return;
+      const cost = controlCost(stock, config, level);
+      if (save.coins < cost) {
+        shake(button);
+        return;
+      }
+      save.coins -= cost;
+      ctl[config.id] = level + 1;
+      save.control[id] = ctl;
+      renderManage();
+      renderAll();
+      saveNow();
+      return;
+    }
+
+    if (mg === "stock-goods") {
+      const ctl = controlOf(id) || defaultControl();
+      ctl.goods = Number(button.dataset.mode);
+      save.control[id] = ctl;
+      renderManage();
+      renderAll();
+      saveNow();
+      return;
+    }
+
+    if (mg === "buyback") {
+      const stock = STOCKS.find((entry) => entry.id === id);
+      if (!stock) return;
+      const cost = Math.ceil((capNow(stock) * 0.002) / 5) * 5;
+      if (save.coins < cost) {
+        shake(button);
+        return;
+      }
+      save.coins -= cost;
+      const startPrice = stock.cap / stock.shares;
+      stockPrices[id] = Math.min(startPrice * 3.5, stockPrices[id] * 1.1);
+      renderManage();
+      renderAll();
+      saveNow();
+      return;
+    }
+
+    if (mg === "sell-company") {
+      const stock = STOCKS.find((entry) => entry.id === id);
+      if (!stock) return;
+      save.coins += Math.ceil((capNow(stock) * 0.4) / 5) * 5;
+      delete save.control[id];
+      save.market[id] = stock.supply;
+      closeManage();
+      renderAll();
+      saveNow();
+      return;
+    }
+
+    if (mg === "biz-up") {
+      const item = BUSINESS.find((entry) => entry.id === id);
+      const config = BIZ_UPGRADES.find((entry) => entry.id === button.dataset.key);
+      if (!item || !config) return;
+      const up = bizUpOf(id);
+      const level = up[config.id] || 0;
+      if (level >= config.max) return;
+      const cost = bizUpgradeCost(item, config, level);
+      if (save.coins < cost) {
+        shake(button);
+        return;
+      }
+      save.coins -= cost;
+      up[config.id] = level + 1;
+      save.bizUp[id] = up;
+      renderManage();
+      renderAll();
+      saveNow();
+      return;
+    }
+
+    if (mg === "biz-price") {
+      const up = bizUpOf(id);
+      up.price = Number(button.dataset.mode);
+      save.bizUp[id] = up;
+      renderManage();
+      renderAll();
+      saveNow();
+      return;
+    }
+
+    if (mg === "biz-close") closeManage();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && manageId) closeManage();
   });
 
   el.business.addEventListener("click", (event) => {
+    const setup = event.target.closest("[data-biz-setup]");
+    if (setup) {
+      openManage("biz", setup.dataset.bizSetup);
+      return;
+    }
     const button = event.target.closest("[data-biz]");
     if (!button) return;
     const item = BUSINESS.find((entry) => entry.id === button.dataset.biz);
     if (!item) return;
+    const count = save.business[item.id] || 0;
+    if (count >= BIZ_MAX) return;
     const cost = businessCost(item);
     if (save.coins < cost) {
       shake(button);
       return;
     }
     save.coins -= cost;
-    save.business[item.id] = (save.business[item.id] || 0) + 1;
+    save.business[item.id] = count + 1;
     renderAll();
     saveNow();
   });
@@ -447,12 +884,17 @@
   setInterval(() => {
     STOCKS.forEach((stock) => {
       stockPrev[stock.id] = stockPrices[stock.id];
-      const drift = (Math.random() - 0.5) * 2 * stock.vol;
-      let next = stockPrices[stock.id] * (1 + drift);
-      next = Math.max(stock.base * 0.3, Math.min(stock.base * 3.5, next));
-      stockPrices[stock.id] = next;
+      const ctl = controlOf(stock.id);
+      const goods = ctl ? GOODS_MODES[ctl.goods] || GOODS_MODES[1] : GOODS_MODES[1];
+      const boost = ctl ? goods.growth * (1 + ctl.ad * 0.12 + ctl.rnd * 0.18) * (1 + ctl.tax * 0.05) : 1;
+      const bias = ctl ? (ctl.ad + ctl.rnd) * 0.0006 * goods.growth : 0;
+      const drift = (Math.random() - 0.5) * 2 * stock.vol * boost;
+      const startPrice = stock.cap / stock.shares;
+      const next = stockPrices[stock.id] * (1 + drift + bias);
+      stockPrices[stock.id] = Math.max(startPrice * 0.3, Math.min(startPrice * 3.5, next));
     });
-    renderStocks();
+    tickStocks();
+    renderBalance();
   }, 900);
 
   document.querySelectorAll(".shop-tab").forEach((tab) => {

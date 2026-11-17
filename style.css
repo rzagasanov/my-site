@@ -1094,15 +1094,421 @@ body {
   cursor: pointer;
 }
 
-.stock-actions button:first-child {
+.stock-actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.stock-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.stock-meta b {
+  color: #ffe083;
+}
+
+.stock-trade {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 5px;
+}
+
+.stock-qty {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 8px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text);
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stock-trade button,
+.stock-actions button {
+  padding: 7px 6px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.stock-trade button.buy {
   color: #06101c;
   border-color: transparent;
   background: linear-gradient(135deg, var(--accent), #8bf0ff);
 }
 
-.stock-actions button:disabled {
+.stock-actions button[data-act="up"] {
+  color: #8bf0b0;
+}
+
+.stock-actions button[data-act="down"] {
+  color: #ffb0a4;
+}
+
+.stock-actions button[data-act="manage"] {
+  color: #06101c;
+  border-color: transparent;
+  background: linear-gradient(135deg, #ffd36e, #ffb347);
+}
+
+/* ===== Бизнес ===== */
+.biz-card {
+  margin-bottom: 7px;
+  padding: 8px 9px;
+  border-radius: 13px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.biz-buy {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  color: var(--text);
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.biz-buy .si-icon {
+  font-size: 26px;
+}
+
+.biz-buy .si-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.biz-buy .si-body b {
+  font-size: 12.5px;
+}
+
+.biz-buy .si-body small {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.biz-buy .si-body em {
+  font-size: 10.5px;
+  font-style: normal;
+  color: #8bf0b0;
+}
+
+.biz-franchise {
+  font-size: 10px;
+  color: #ffd36e;
+}
+
+.biz-buy .si-price {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #ffe083;
+  white-space: nowrap;
+}
+
+.biz-buy:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.biz-setup {
+  width: 100%;
+  margin-top: 7px;
+  padding: 7px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  border-radius: 9px;
+  border: 1px solid rgba(94, 231, 255, 0.35);
+  background: rgba(94, 231, 255, 0.08);
+  cursor: pointer;
+}
+
+.biz-setup:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ===== Окно управления ===== */
+.manage-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(3, 6, 14, 0.82);
+  backdrop-filter: blur(6px);
+}
+
+.manage-overlay.show {
+  display: flex;
+}
+
+.manage-modal {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(94, 231, 255, 0.3);
+  background: #131a2b;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+}
+
+.manage-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--muted);
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.manage-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 36px;
+  margin-bottom: 12px;
+}
+
+.manage-head img {
+  width: 46px;
+  height: 46px;
+  padding: 4px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.mg-biz-icon {
+  font-size: 38px;
+}
+
+.manage-head h3 {
+  margin: 0 0 2px;
+  font-size: 18px;
+}
+
+.manage-head small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.manage-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.manage-stats span {
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.manage-stats b {
+  color: #ffe083;
+}
+
+.manage-modal h4 {
+  margin: 14px 0 8px;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.mg-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 7px;
+}
+
+.mg-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 10px;
+  text-align: left;
+  color: var(--text);
+  border-radius: 13px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+}
+
+.mg-item.can {
+  border-color: rgba(94, 231, 255, 0.4);
+}
+
+.mg-item:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.mg-icon {
+  font-size: 20px;
+}
+
+.mg-item b {
+  font-size: 12px;
+}
+
+.mg-item small {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.mg-item em {
+  margin-top: 2px;
+  font-size: 11px;
+  font-style: normal;
+  color: #ffe083;
+}
+
+.mg-bar {
+  display: flex;
+  gap: 3px;
+  width: 100%;
+  margin-top: 3px;
+}
+
+.mg-bar i {
+  flex: 1;
+  height: 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.mg-bar i.on {
+  background: var(--accent);
+}
+
+.mg-modes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.mg-modes button {
+  padding: 8px 4px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.mg-modes button.active {
+  color: #06101c;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), #8bf0ff);
+}
+
+.mg-modes button small {
+  display: block;
+  margin-top: 2px;
+  font-size: 8.5px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.mg-modes button.active small {
+  color: rgba(6, 16, 28, 0.7);
+}
+
+.mg-note {
+  margin: 8px 0 0;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.mg-note b {
+  color: #ffe083;
+}
+
+.mg-extra {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.mg-extra button {
+  padding: 10px 8px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.mg-extra button.danger {
+  color: #ffb3b3;
+  border-color: rgba(255, 90, 90, 0.35);
+}
+
+.mg-extra button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+.mg-extra button small {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+@media (max-width: 420px) {
+  .stock-trade {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+  .mg-grid {
+    grid-template-columns: 1fr;
+  }
+  .mg-extra {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ===== Кредит ===== */
