@@ -710,14 +710,15 @@ body {
 }
 
 .shop-tabs {
-  display: flex;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
 }
 
 .shop-tab {
-  padding: 7px 11px;
+  padding: 7px 3px;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 10.5px;
   font-weight: 600;
   border-radius: 9px;
   border: 1px solid var(--line);
@@ -925,12 +926,14 @@ body {
 
 .shelf-grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(10, minmax(0, 1fr));
   gap: 4px;
 }
 
 .shelf-item {
   aspect-ratio: 1;
+  min-width: 0;
+  overflow: hidden;
   display: grid;
   place-items: center;
   border-radius: 9px;
@@ -990,6 +993,178 @@ body {
     font-size: 38px;
     border-radius: 14px;
   }
+}
+
+/* ===== Акции ===== */
+.stocks-summary {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  border: 1px solid rgba(94, 231, 255, 0.25);
+  background: rgba(94, 231, 255, 0.08);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.stocks-summary b {
+  color: var(--accent);
+}
+
+.stock-card {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+  padding: 9px 10px;
+  border-radius: 13px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.stock-logo {
+  width: 34px;
+  height: 34px;
+  padding: 3px;
+  object-fit: contain;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.stock-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.stock-info b {
+  font-size: 12.5px;
+}
+
+.stock-info small {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.stock-price {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: right;
+}
+
+.stock-price b {
+  font-size: 12.5px;
+  color: #ffe083;
+}
+
+.stock-price small {
+  font-size: 10px;
+}
+
+.up {
+  color: #4ade80;
+}
+
+.down {
+  color: #ff7b6b;
+}
+
+.stock-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+}
+
+.stock-actions button {
+  flex: 1;
+  padding: 7px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.stock-actions button:first-child {
+  color: #06101c;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), #8bf0ff);
+}
+
+.stock-actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ===== Кредит ===== */
+.loan-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffb3b3;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 90, 90, 0.4);
+  background: linear-gradient(135deg, rgba(200, 40, 40, 0.2), rgba(120, 0, 0, 0.2));
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.loan-btn:hover {
+  background: rgba(200, 40, 40, 0.32);
+}
+
+.haram-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  background: radial-gradient(circle at center, #d81e1e, #4d0000 75%);
+}
+
+.haram-overlay.show {
+  display: flex;
+  animation: haramIn 0.2s ease;
+}
+
+.haram-text {
+  font-size: clamp(56px, 18vw, 130px);
+  font-weight: 900;
+  letter-spacing: 8px;
+  text-shadow: 0 0 34px rgba(0, 0, 0, 0.6);
+  animation: haramPulse 0.45s ease-in-out infinite alternate;
+}
+
+.haram-sub {
+  margin-top: 12px;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+@keyframes haramIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes haramPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
 }
 
 @media (max-width: 420px) {

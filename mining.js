@@ -27,6 +27,44 @@
     { id: "rza", photo: "assets/rza.jpg", name: "Рза", desc: "Тот самый Рза", price: 500000 },
     { id: "sabir", photo: "assets/sabir.jpg", name: "Сабир", desc: "Хранитель коллекции", price: 500000 },
     { id: "vugar", photo: "assets/vugar.jpg", name: "Вугар", desc: "Финальный трофей", price: 500000 },
+    { id: "r_coffee", photo: "assets/items/coffee.jpg", name: "Чашка кофе", desc: "С чего начинается день", price: 500 },
+    { id: "r_sneakers", photo: "assets/items/sneakers.jpg", name: "Кроссовки", desc: "Бегом за деньгами", price: 2500 },
+    { id: "r_iphone", photo: "assets/items/iphone.png", name: "iPhone", desc: "Всегда на связи", price: 15000 },
+    { id: "r_rolex", photo: "assets/items/rolex.png", name: "Rolex", desc: "Время — деньги", price: 100000 },
+    { id: "r_ferrari", photo: "assets/items/ferrari.png", name: "Ferrari", desc: "Гонки по городу", price: 500000 },
+    { id: "r_yacht", photo: "assets/items/yacht.jpg", name: "Яхта", desc: "Отдых на волнах", price: 2000000 },
+    { id: "r_jet", photo: "assets/items/jet.jpg", name: "Самолёт", desc: "Первый класс всегда", price: 10000000 },
+    { id: "r_mansion", photo: "assets/items/mansion.jpg", name: "Особняк", desc: "Дом мечты", price: 50000000 },
+    { id: "r_island", photo: "assets/items/island.jpg", name: "Свой остров", desc: "Только ты и океан", price: 200000000 },
+    { id: "r_painting", photo: "assets/items/painting.jpg", name: "Звёздная ночь", desc: "Настоящий Ван Гог", price: 400000000 },
+    { id: "r_oilrig", photo: "assets/items/oilrig.jpg", name: "Нефтяная вышка", desc: "Чёрное золото", price: 600000000 },
+    { id: "r_rocket", photo: "assets/items/rocket.jpg", name: "Космический корабль", desc: "Полёт к звёздам", price: 800000000 },
+    { id: "r_asteroid", photo: "assets/items/asteroid.jpg", name: "Астероид", desc: "Небесное тело твоё", price: 950000000 },
+    { id: "r_sun", photo: "assets/items/sun.jpg", name: "Солнце", desc: "Всё освещает тебе", price: 1000000000 },
+  ];
+
+  const STOCKS = [
+    { id: "apple", name: "Apple", ticker: "AAPL", logo: "assets/logos/apple.png", base: 420, vol: 0.06 },
+    { id: "tesla", name: "Tesla", ticker: "TSLA", logo: "assets/logos/tesla.png", base: 780, vol: 0.09 },
+    { id: "nvidia", name: "NVIDIA", ticker: "NVDA", logo: "assets/logos/nvidia.png", base: 1250, vol: 0.08 },
+    { id: "google", name: "Google", ticker: "GOOG", logo: "assets/logos/google.png", base: 610, vol: 0.05 },
+    { id: "amazon", name: "Amazon", ticker: "AMZN", logo: "assets/logos/amazon.png", base: 890, vol: 0.06 },
+    { id: "microsoft", name: "Microsoft", ticker: "MSFT", logo: "assets/logos/microsoft.png", base: 730, vol: 0.05 },
+    { id: "coca", name: "Coca-Cola", ticker: "KO", logo: "assets/logos/coca.png", base: 180, vol: 0.04 },
+    { id: "mcd", name: "McDonald's", ticker: "MCD", logo: "assets/logos/mcd.png", base: 260, vol: 0.04 },
+    { id: "visa", name: "Visa", ticker: "V", logo: "assets/logos/visa.png", base: 540, vol: 0.05 },
+    { id: "samsung", name: "Samsung", ticker: "SSNLF", logo: "assets/logos/samsung.png", base: 320, vol: 0.06 },
+  ];
+
+  const BUSINESS = [
+    { id: "stall", icon: "🥤", name: "Ларёк", desc: "+2 ₿ в секунду", base: 1000, growth: 1.5, income: 2 },
+    { id: "cafe", icon: "☕", name: "Кафе", desc: "+15 ₿ в секунду", base: 10000, growth: 1.5, income: 15 },
+    { id: "shop", icon: "🏪", name: "Магазин", desc: "+120 ₿ в секунду", base: 100000, growth: 1.5, income: 120 },
+    { id: "mall", icon: "🏬", name: "Торговый центр", desc: "+1 000 ₿ в секунду", base: 1000000, growth: 1.5, income: 1000 },
+    { id: "factory", icon: "🏭", name: "Завод", desc: "+8 000 ₿ в секунду", base: 10000000, growth: 1.5, income: 8000 },
+    { id: "oil", icon: "🛢️", name: "Нефтекомпания", desc: "+60 000 ₿ в секунду", base: 100000000, growth: 1.5, income: 60000 },
+    { id: "bank", icon: "🏦", name: "Банк", desc: "+250 000 ₿ в секунду", base: 500000000, growth: 1.5, income: 250000 },
+    { id: "corp", icon: "🌐", name: "Корпорация", desc: "+1 000 000 ₿ в секунду", base: 1000000000, growth: 1.5, income: 1000000 },
   ];
 
   const el = {
@@ -44,12 +82,16 @@
     shelf: document.getElementById("shelf"),
     shelfCount: document.getElementById("collection-count"),
     reset: document.getElementById("mine-reset"),
+    stocks: document.getElementById("shop-stocks"),
+    business: document.getElementById("shop-business"),
+    loan: document.getElementById("loan-btn"),
+    overlay: document.getElementById("haram-overlay"),
   };
 
   if (!el.coin) return;
 
   function fresh() {
-    return { coins: 0, total: 0, taps: 0, crits: 0, owned: {}, items: {} };
+    return { coins: 0, total: 0, taps: 0, crits: 0, owned: {}, items: {}, stocks: {}, business: {} };
   }
 
   function load() {
@@ -65,6 +107,8 @@
         crits: Number(saved.crits) || 0,
         owned: saved.owned && typeof saved.owned === "object" ? saved.owned : {},
         items: saved.items && typeof saved.items === "object" ? saved.items : {},
+        stocks: saved.stocks && typeof saved.stocks === "object" ? saved.stocks : {},
+        business: saved.business && typeof saved.business === "object" ? saved.business : {},
       };
     } catch (error) {
       return base;
@@ -73,6 +117,13 @@
 
   let save = load();
   let saveTimer = 0;
+
+  const stockPrices = {};
+  const stockPrev = {};
+  STOCKS.forEach((stock) => {
+    stockPrices[stock.id] = stock.base;
+    stockPrev[stock.id] = stock.base;
+  });
 
   function saveNow() {
     try {
@@ -108,6 +159,10 @@
       if (buff.kind === "tap") tap += buff.amount * count;
       if (buff.kind === "sec") sec += buff.amount * count;
       if (buff.kind === "mult") mult *= Math.pow(buff.amount, count);
+    });
+    BUSINESS.forEach((item) => {
+      const count = save.business[item.id] || 0;
+      if (count) sec += item.income * count;
     });
     return { tap: tap * mult, sec: sec * mult };
   }
@@ -180,9 +235,70 @@
     }).join("");
   }
 
+  function businessCost(item) {
+    return Math.ceil(item.base * Math.pow(item.growth, save.business[item.id] || 0));
+  }
+
+  function renderBusiness() {
+    el.business.innerHTML = BUSINESS.map((item) => {
+      const count = save.business[item.id] || 0;
+      const cost = businessCost(item);
+      const can = save.coins >= cost;
+      return (
+        '<button class="shop-item' + (can ? " can" : "") + '" type="button" data-biz="' + item.id + '">' +
+        '<span class="si-icon">' + item.icon + "</span>" +
+        '<span class="si-body"><b>' + item.name + "</b><small>" + item.desc + "</small>" +
+        "<em>Куплено: " + count + "</em></span>" +
+        '<span class="si-price">' + fmt(cost) + " ₿</span>" +
+        "</button>"
+      );
+    }).join("");
+  }
+
+  function renderStocks() {
+    let value = 0;
+    let cost = 0;
+    let qty = 0;
+    STOCKS.forEach((stock) => {
+      const held = save.stocks[stock.id];
+      if (!held || !held.qty) return;
+      qty += held.qty;
+      value += stockPrices[stock.id] * held.qty;
+      cost += held.avg * held.qty;
+    });
+    const profit = value - cost;
+
+    el.stocks.innerHTML =
+      '<div class="stocks-summary">' +
+      "<span>В портфеле: <b>" + qty + "</b> акций</span>" +
+      "<span>Стоимость: <b>" + fmt(value) + " ₿</b></span>" +
+      '<span class="' + (profit >= 0 ? "up" : "down") + '">' + (profit >= 0 ? "+" : "") + fmt(profit) + " ₿</span>" +
+      "</div>" +
+      STOCKS.map((stock) => {
+        const price = stockPrices[stock.id];
+        const previous = stockPrev[stock.id] || price;
+        const delta = ((price - previous) / previous) * 100;
+        const held = save.stocks[stock.id];
+        const heldQty = held ? held.qty : 0;
+        return (
+          '<div class="stock-card">' +
+          '<img class="stock-logo" src="' + stock.logo + '" alt="' + stock.name + '">' +
+          '<div class="stock-info"><b>' + stock.name + "</b><small>" + stock.ticker + " · у тебя " + heldQty + "</small></div>" +
+          '<div class="stock-price"><b>' + fmt(price) + " ₿</b>" +
+          '<small class="' + (delta >= 0 ? "up" : "down") + '">' + (delta >= 0 ? "▲" : "▼") + " " + Math.abs(delta).toFixed(1) + "%</small></div>" +
+          '<div class="stock-actions">' +
+          '<button type="button" data-buy="' + stock.id + '">Купить</button>' +
+          '<button type="button" data-sell="' + stock.id + '"' + (heldQty ? "" : " disabled") + ">Продать</button>" +
+          "</div></div>"
+        );
+      }).join("");
+  }
+
   function renderAll() {
     renderBalance();
     renderShop();
+    renderStocks();
+    renderBusiness();
   }
 
   function shake(node) {
@@ -241,6 +357,83 @@
     renderAll();
     saveNow();
   });
+
+  el.stocks.addEventListener("click", (event) => {
+    const buyBtn = event.target.closest("[data-buy]");
+    const sellBtn = event.target.closest("[data-sell]");
+
+    if (buyBtn) {
+      const stock = STOCKS.find((item) => item.id === buyBtn.dataset.buy);
+      if (!stock) return;
+      const price = stockPrices[stock.id];
+      if (save.coins < price) {
+        shake(buyBtn);
+        return;
+      }
+      save.coins -= price;
+      const held = save.stocks[stock.id] || { qty: 0, avg: 0 };
+      held.avg = (held.avg * held.qty + price) / (held.qty + 1);
+      held.qty += 1;
+      save.stocks[stock.id] = held;
+      renderAll();
+      saveNow();
+      return;
+    }
+
+    if (sellBtn) {
+      const stock = STOCKS.find((item) => item.id === sellBtn.dataset.sell);
+      if (!stock) return;
+      const held = save.stocks[stock.id];
+      if (!held || held.qty < 1) {
+        shake(sellBtn);
+        return;
+      }
+      save.coins += stockPrices[stock.id];
+      held.qty -= 1;
+      if (!held.qty) delete save.stocks[stock.id];
+      renderAll();
+      saveNow();
+    }
+  });
+
+  el.business.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-biz]");
+    if (!button) return;
+    const item = BUSINESS.find((entry) => entry.id === button.dataset.biz);
+    if (!item) return;
+    const cost = businessCost(item);
+    if (save.coins < cost) {
+      shake(button);
+      return;
+    }
+    save.coins -= cost;
+    save.business[item.id] = (save.business[item.id] || 0) + 1;
+    renderAll();
+    saveNow();
+  });
+
+  el.loan.addEventListener("click", () => {
+    save.coins = 0;
+    saveNow();
+    renderAll();
+    el.overlay.classList.add("show");
+    el.overlay.setAttribute("aria-hidden", "false");
+    setTimeout(() => {
+      el.overlay.classList.remove("show");
+      el.overlay.setAttribute("aria-hidden", "true");
+    }, 2200);
+  });
+
+  setInterval(() => {
+    STOCKS.forEach((stock) => {
+      stockPrev[stock.id] = stockPrices[stock.id];
+      const drift = (Math.random() - 0.5) * 2 * stock.vol;
+      let next = stockPrices[stock.id] * (1 + drift);
+      next = Math.max(stock.base * 0.3, Math.min(stock.base * 3.5, next));
+      stockPrices[stock.id] = next;
+    });
+    renderStocks();
+  }, 900);
 
   document.querySelectorAll(".shop-tab").forEach((tab) => {
     tab.addEventListener("click", () => {

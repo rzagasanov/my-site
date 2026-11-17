@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Моя страница — игры и музыка</title>
   <meta name="description" content="Фото, любимая музыка, крестики-нолики и майнинг токенов.">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
   <main class="page">
@@ -135,17 +135,23 @@
             <h3>Магазин</h3>
             <div class="shop-tabs">
               <button class="shop-tab active" type="button" data-shop="buffs">Бафы</button>
+              <button class="shop-tab" type="button" data-shop="stocks">Акции</button>
+              <button class="shop-tab" type="button" data-shop="business">Бизнес</button>
               <button class="shop-tab" type="button" data-shop="collection">Коллекция</button>
             </div>
           </div>
 
           <div class="shop-view active" id="shop-buffs"></div>
+          <div class="shop-view" id="shop-stocks"></div>
+          <div class="shop-view" id="shop-business"></div>
           <div class="shop-view item-grid" id="shop-collection"></div>
 
           <div class="collection-shelf">
-            <div class="shelf-title">Моя коллекция <span id="collection-count">0 / 15</span></div>
+            <div class="shelf-title">Моя коллекция <span id="collection-count">0 / 29</span></div>
             <div class="shelf-grid" id="shelf"></div>
           </div>
+
+          <button class="loan-btn" id="loan-btn" type="button">💸 Взять кредит под процент</button>
 
           <button class="reset small" id="mine-reset" type="button">Сбросить прогресс</button>
         </div>
@@ -157,8 +163,13 @@
     <span>Сделано с ❤️</span>
   </footer>
 
-  <script src="script.js?v=5"></script>
-  <script src="player.js?v=5"></script>
-  <script src="mining.js?v=5"></script>
+  <div class="haram-overlay" id="haram-overlay" aria-hidden="true">
+    <div class="haram-text">ХАРАМ</div>
+    <div class="haram-sub">Все деньги конфискованы</div>
+  </div>
+
+  <script src="script.js?v=6"></script>
+  <script src="player.js?v=6"></script>
+  <script src="mining.js?v=6"></script>
 </body>
 </html>
