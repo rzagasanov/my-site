@@ -14,6 +14,36 @@
         <img class="photo" src="assets/avatar.jpg" alt="Фото">
       </div>
       <p class="quote">“Красота в глазах смотрящего”</p>
+
+      <div class="player" id="player">
+        <audio id="audio" src="assets/music.mp3" loop preload="metadata"></audio>
+
+        <div class="player-top">
+          <button class="play" id="play" type="button" aria-label="Включить музыку">▶</button>
+          <div class="track">
+            <span class="track-title">Where you are</span>
+            <span class="track-artist">Halal Beats · Slowed</span>
+          </div>
+          <div class="player-actions">
+            <button class="pbtn" id="restart" type="button" aria-label="С начала" title="С начала">⏮</button>
+            <button class="pbtn" id="forward" type="button" aria-label="Вперёд 10 секунд" title="Вперёд 10 секунд">⏩</button>
+            <button class="pbtn on" id="repeat" type="button" aria-label="Повтор" title="Повтор">🔁</button>
+            <button class="pbtn" id="mute" type="button" aria-label="Звук" title="Звук">🔊</button>
+          </div>
+        </div>
+
+        <div class="progress-row">
+          <span class="time" id="current">0:00</span>
+          <input class="seek" id="seek" type="range" min="0" max="1000" value="0" style="--fill:0%" aria-label="Перемотка">
+          <span class="time" id="duration">0:00</span>
+        </div>
+
+        <div class="volume-row">
+          <span class="vol-label">🔈</span>
+          <input class="volume" id="volume" type="range" min="0" max="100" value="70" style="--fill:70%" aria-label="Громкость">
+          <span class="vol-value" id="vol-value">70%</span>
+        </div>
+      </div>
     </section>
 
     <section class="game" id="game">
@@ -58,5 +88,6 @@
   </footer>
 
   <script src="script.js"></script>
+  <script src="player.js"></script>
 </body>
 </html>
