@@ -123,6 +123,13 @@
     manageOverlay: document.getElementById("manage-overlay"),
     manageContent: document.getElementById("manage-content"),
     manageClose: document.getElementById("manage-close"),
+    nickOverlay: document.getElementById("nick-overlay"),
+    nickInput: document.getElementById("nick-input"),
+    nickError: document.getElementById("nick-error"),
+    nickSave: document.getElementById("nick-save"),
+    nickChange: document.getElementById("nick-change"),
+    topList: document.getElementById("top-list"),
+    topRefresh: document.getElementById("top-refresh"),
   };
 
   if (!el.coin) return;
@@ -179,6 +186,26 @@
   let save = load();
   let saveTimer = 0;
 
+  // Общий топ: хранилище без регистрации, данные доступны всем посетителям.
+  const TOP_URL = "https://mantledb.sh/v2/rzagasanov-mining-top/leaderboard";
+  const NICK_KEY = "mineNick_v1";
+  const PLAYER_KEY = "minePlayerId_v1";
+  let publishTimer = 0;
+  let topData = {};
+
+  function storeGet(key) {
+    try { return localStorage.getItem(key); } catch (error) { return null; }
+  }
+  function storeSet(key, value) {
+    try { localStorage.setItem(key, value); } catch (error) { /* игнорируем */ }
+  }
+  let playerId = storeGet(PLAYER_KEY);
+  if (!playerId) {
+    playerId = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    storeSet(PLAYER_KEY, playerId);
+  }
+  let nick = storeGet(NICK_KEY) || "";
+
   const stockPrices = {};
   const stockPrev = {};
   const qtyDraft = {};
@@ -197,6 +224,7 @@
     } catch (error) {
       /* приватный режим — просто не сохраняем */
     }
+    schedulePublish();
   }
 
   function saveSoon() {
@@ -921,6 +949,133 @@
     renderBalance();
     saveSoon();
   }, 1000);
+
+  // ===== Общий топ =====
+  function netWorth() {
+    let total = save.coins;
+    ITEMS.forEach((item) => {
+      if (save.items[item.id]) total += item.price;
+    });
+    STOCKS.forEach((stock) => {
+      const held = save.stocks[stock.id];
+      if (held && held.qty) total += (stock.cap / stock.shares) * held.qty;
+    });
+    BUSINESS.forEach((item) => {
+      const count = save.business[item.id] || 0;
+      if (count) total += item.base * (Math.pow(item.growth, count) - 1) / (item.growth - 1);
+    });
+    BUFFS.forEach((buff) => {
+      const count = save.owned[buff.id] || 0;
+      for (let i = 0; i < count; i++) total += Math.ceil(buff.base * Math.pow(buff.growth, i));
+    });
+    return Math.round(total);
+  }
+
+  function renderTop() {
+    const rows = Object.entries(topData).filter((entry) => entry[1] && Number.isFinite(Number(entry[1].score)));
+    rows.sort((a, b) => Number(b[1].score) - Number(a[1].score));
+    el.topList.textContent = "";
+    if (!rows.length) {
+      el.topList.textContent = "Пока пусто — стань первым!";
+      return;
+    }
+    const medals = ["🥇", "🥈", "🥉"];
+    rows.slice(0, 15).forEach(([id, item], index) => {
+      const row = document.createElement("div");
+      row.className = "top-row" + (id === playerId ? " me" : "");
+      const place = document.createElement("span");
+      place.className = "top-place";
+      place.textContent = medals[index] || String(index + 1);
+      const name = document.createElement("span");
+      name.className = "top-name";
+      name.textContent = String(item.nick || "Без ника").slice(0, 16) + (id === playerId ? " (ты)" : "");
+      const score = document.createElement("span");
+      score.className = "top-score";
+      score.textContent = fmt(Number(item.score)) + " ₿";
+      row.append(place, name, score);
+      el.topList.appendChild(row);
+    });
+  }
+
+  async function topRead() {
+    const response = await fetch(TOP_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    return data && typeof data === "object" ? data : {};
+  }
+
+  async function topPublish() {
+    if (!nick) return;
+    try {
+      let data = {};
+      try { data = await topRead(); } catch (error) { /* первую запись создадим сами */ }
+      data[playerId] = { nick: nick, score: netWorth(), ts: Date.now() };
+      topData = data;
+      renderTop();
+      await fetch(TOP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } catch (error) {
+      el.topList.textContent = "Нет связи с топом — попробуй обновить позже";
+    }
+  }
+
+  async function topRefresh() {
+    try {
+      topData = await topRead();
+      renderTop();
+    } catch (error) {
+      el.topList.textContent = "Не удалось загрузить топ";
+    }
+  }
+
+  function schedulePublish() {
+    if (!nick || publishTimer) return;
+    publishTimer = setTimeout(() => {
+      publishTimer = 0;
+      topPublish();
+    }, 6000);
+  }
+
+  function showNickModal(change) {
+    el.nickInput.value = change ? nick : "";
+    el.nickError.textContent = "";
+    el.nickOverlay.classList.add("show");
+    el.nickOverlay.setAttribute("aria-hidden", "false");
+    setTimeout(() => el.nickInput.focus(), 60);
+  }
+
+  function saveNick() {
+    const value = el.nickInput.value.trim().replace(/\s+/g, " ").slice(0, 16);
+    if (value.length < 2) {
+      el.nickError.textContent = "Напиши ник — хотя бы 2 буквы";
+      return;
+    }
+    nick = value;
+    storeSet(NICK_KEY, nick);
+    el.nickOverlay.classList.remove("show");
+    el.nickOverlay.setAttribute("aria-hidden", "true");
+    topPublish();
+  }
+
+  el.nickSave.addEventListener("click", saveNick);
+  el.nickInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") saveNick();
+  });
+  el.nickChange.addEventListener("click", () => showNickModal(true));
+  el.topRefresh.addEventListener("click", () => {
+    topRefresh();
+    topPublish();
+  });
+
+  if (!nick) showNickModal(false);
+  else topRefresh();
+
+  setInterval(() => {
+    if (nick) topPublish();
+  }, 30000);
 
   renderAll();
 })();

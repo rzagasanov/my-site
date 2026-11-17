@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Моя страница — игры и музыка</title>
   <meta name="description" content="Фото, любимая музыка, крестики-нолики и майнинг токенов.">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
   <main class="page">
@@ -131,6 +131,15 @@
             <div class="stat"><span>Критов</span><b id="crit-count">0</b></div>
           </div>
 
+          <div class="top-block">
+            <div class="top-head">
+              <h3>🏆 Топ по состоянию</h3>
+              <button id="top-refresh" type="button" aria-label="Обновить топ">⟳ Обновить</button>
+            </div>
+            <div class="top-list" id="top-list">Загрузка…</div>
+            <button class="nick-change" id="nick-change" type="button">✏️ Сменить ник</button>
+          </div>
+
           <div class="shop-head">
             <h3>Магазин</h3>
             <div class="shop-tabs">
@@ -171,6 +180,17 @@
     <div class="haram-sub">Все деньги конфискованы</div>
   </div>
 
+  <div class="nick-overlay" id="nick-overlay" aria-hidden="true">
+    <div class="nick-modal">
+      <h2>👋 Давай знакомиться</h2>
+      <p>Напиши ник — он будет показан в общем топе по состоянию.</p>
+      <input id="nick-input" type="text" maxlength="16" autocomplete="off" placeholder="Например, Рза" aria-label="Твой ник">
+      <div class="nick-error" id="nick-error"></div>
+      <button id="nick-save" type="button">Войти в игру</button>
+      <small>Ник сохранится на этом устройстве. Его можно поменять в блоке «Топ».</small>
+    </div>
+  </div>
+
   <div class="manage-overlay" id="manage-overlay" aria-hidden="true">
     <div class="manage-modal">
       <button class="manage-close" id="manage-close" type="button" aria-label="Закрыть">✕</button>
@@ -178,8 +198,8 @@
     </div>
   </div>
 
-  <script src="script.js?v=8"></script>
-  <script src="player.js?v=8"></script>
-  <script src="mining.js?v=8"></script>
+  <script src="script.js?v=9"></script>
+  <script src="player.js?v=9"></script>
+  <script src="mining.js?v=9"></script>
 </body>
 </html>
