@@ -8,7 +8,7 @@
     { id: "core", icon: "🔋", name: "Энерго-ядро", desc: "+3 ₿ за каждый тап", base: 150, growth: 1.8, kind: "tap", amount: 3, max: Infinity },
     { id: "farm", icon: "🏭", name: "Ферма майнинга", desc: "+5 ₿ каждую секунду", base: 400, growth: 1.9, kind: "sec", amount: 5, max: Infinity },
     { id: "ai", icon: "🧠", name: "ИИ-помощник", desc: "+15 ₿ каждую секунду", base: 1200, growth: 2, kind: "sec", amount: 15, max: Infinity },
-    { id: "rocket", icon: "🚀", name: "Ракетный ускоритель", desc: "×2 ко всему доходу", base: 3000, growth: 3, kind: "mult", amount: 2, max: 5 },
+    { id: "rocket", icon: "🚀", name: "Ракетный ускоритель", desc: "×2 к доходу от тапов и бафов", base: 3000, growth: 4, kind: "mult", amount: 2, max: 3 },
   ];
 
   const ITEMS = [
@@ -49,55 +49,58 @@
   // cap — капитализация, shares — всего акций, supply — сколько лежит на рынке.
   // Цена одной акции = кап / акции. Кап от 50 млн до 25 млрд.
   const STOCKS = [
-    { id: "coca", name: "Coca-Cola", ticker: "KO", logo: "assets/logos/coca.png", cap: 50000000, shares: 100000000, supply: 20000, vol: 0.05 },
-    { id: "mcd", name: "McDonald's", ticker: "MCD", logo: "assets/logos/mcd.png", cap: 120000000, shares: 60000000, supply: 12000, vol: 0.06 },
-    { id: "samsung", name: "Samsung", ticker: "SSNLF", logo: "assets/logos/samsung.png", cap: 500000000, shares: 100000000, supply: 10000, vol: 0.07 },
-    { id: "visa", name: "Visa", ticker: "V", logo: "assets/logos/visa.png", cap: 1200000000, shares: 120000000, supply: 8000, vol: 0.06 },
-    { id: "google", name: "Google", ticker: "GOOG", logo: "assets/logos/google.png", cap: 2400000000, shares: 120000000, supply: 6000, vol: 0.07 },
-    { id: "amazon", name: "Amazon", ticker: "AMZN", logo: "assets/logos/amazon.png", cap: 3500000000, shares: 100000000, supply: 5000, vol: 0.07 },
-    { id: "microsoft", name: "Microsoft", ticker: "MSFT", logo: "assets/logos/microsoft.png", cap: 5000000000, shares: 100000000, supply: 4000, vol: 0.06 },
-    { id: "tesla", name: "Tesla", ticker: "TSLA", logo: "assets/logos/tesla.png", cap: 7500000000, shares: 150000000, supply: 3000, vol: 0.09 },
-    { id: "nvidia", name: "NVIDIA", ticker: "NVDA", logo: "assets/logos/nvidia.png", cap: 12000000000, shares: 120000000, supply: 2500, vol: 0.08 },
-    { id: "apple", name: "Apple", ticker: "AAPL", logo: "assets/logos/apple.png", cap: 25000000000, shares: 100000000, supply: 2000, vol: 0.06 },
+    { id: "coca", name: "Coca-Cola", ticker: "KO", logo: "assets/logos/coca.png", cap: 50000000, shares: 100000000, supply: 20000, vol: 0.012 },
+    { id: "mcd", name: "McDonald's", ticker: "MCD", logo: "assets/logos/mcd.png", cap: 120000000, shares: 60000000, supply: 12000, vol: 0.014 },
+    { id: "samsung", name: "Samsung", ticker: "SSNLF", logo: "assets/logos/samsung.png", cap: 500000000, shares: 100000000, supply: 10000, vol: 0.016 },
+    { id: "visa", name: "Visa", ticker: "V", logo: "assets/logos/visa.png", cap: 1200000000, shares: 120000000, supply: 8000, vol: 0.014 },
+    { id: "google", name: "Google", ticker: "GOOG", logo: "assets/logos/google.png", cap: 2400000000, shares: 120000000, supply: 6000, vol: 0.016 },
+    { id: "amazon", name: "Amazon", ticker: "AMZN", logo: "assets/logos/amazon.png", cap: 3500000000, shares: 100000000, supply: 5000, vol: 0.016 },
+    { id: "microsoft", name: "Microsoft", ticker: "MSFT", logo: "assets/logos/microsoft.png", cap: 5000000000, shares: 100000000, supply: 4000, vol: 0.014 },
+    { id: "tesla", name: "Tesla", ticker: "TSLA", logo: "assets/logos/tesla.png", cap: 7500000000, shares: 150000000, supply: 3000, vol: 0.018 },
+    { id: "nvidia", name: "NVIDIA", ticker: "NVDA", logo: "assets/logos/nvidia.png", cap: 12000000000, shares: 120000000, supply: 2500, vol: 0.016 },
+    { id: "apple", name: "Apple", ticker: "AAPL", logo: "assets/logos/apple.png", cap: 25000000000, shares: 100000000, supply: 2000, vol: 0.014 },
   ];
 
   // Режим цены товаров влияет и на прибыль, и на рост курса.
+  // Низкая цена = больше покупателей и быстрый рост курса, но меньше прибыли.
+  // Премиум = много прибыли с каждой продажи, но курс растёт медленнее.
   const GOODS_MODES = [
-    { name: "Низкая", income: 0.5, growth: 0.65 },
+    { name: "Низкая", income: 0.6, growth: 1.5 },
     { name: "Средняя", income: 1, growth: 1 },
-    { name: "Высокая", income: 2, growth: 0.85 },
-    { name: "Премиум", income: 4, growth: 0.6 },
+    { name: "Высокая", income: 1.8, growth: 0.7 },
+    { name: "Премиум", income: 3, growth: 0.4 },
   ];
 
   const CONTROLS = [
-    { id: "ad", icon: "📢", name: "Реклама", desc: "Курс растёт быстрее", max: 5, price: 0.0004 },
-    { id: "div", icon: "💰", name: "Дивиденды", desc: "Доход с каждой акции", max: 5, price: 0.0005 },
-    { id: "rnd", icon: "🔬", name: "Исследования", desc: "Рост капитализации", max: 5, price: 0.0006 },
-    { id: "tax", icon: "🧾", name: "Оптимизация налогов", desc: "Больше прибыли", max: 3, price: 0.0008 },
+    { id: "ad", icon: "📢", name: "Реклама", desc: "Курс растёт быстрее", max: 5, price: 0.00002 },
+    { id: "div", icon: "💰", name: "Дивиденды", desc: "Доход с каждой акции", max: 5, price: 0.00003 },
+    { id: "rnd", icon: "🔬", name: "Исследования", desc: "Рост капитализации", max: 5, price: 0.00004 },
+    { id: "tax", icon: "🧾", name: "Оптимизация налогов", desc: "Больше прибыли", max: 3, price: 0.00005 },
   ];
 
   // Бизнес: до 5 точек каждого вида, у каждой свои настройки (не как у акций).
   const BIZ_MAX = 5;
   const BIZ_PRICES = [
-    { name: "Эконом", mult: 0.7, desc: "Дешевле, но меньше прибыли" },
+    { name: "Эконом", mult: 0.8, desc: "Дешевле, но меньше прибыли" },
     { name: "Стандарт", mult: 1, desc: "Обычная цена" },
-    { name: "Люкс", mult: 1.8, desc: "Дорого, но прибыльнее" },
+    { name: "Люкс", mult: 1.4, desc: "Дороже и прибыльнее" },
+    { name: "Премиум", mult: 2, desc: "Только для богатых покупателей" },
   ];
   const BIZ_UPGRADES = [
-    { id: "manager", icon: "🧑‍💼", name: "Менеджер", desc: "+25% к доходу точки", max: 5, price: 0.00006 },
-    { id: "equip", icon: "🔧", name: "Оборудование", desc: "+40% к доходу точки", max: 5, price: 0.0001 },
-    { id: "supply", icon: "🚚", name: "Поставщики", desc: "+12% за счёт экономии", max: 3, price: 0.00015 },
+    { id: "manager", icon: "🧑‍💼", name: "Менеджер", desc: "+12% к доходу точки", max: 3, gain: 0.12, price: 0.02 },
+    { id: "equip", icon: "🔧", name: "Оборудование", desc: "+18% к доходу точки", max: 3, gain: 0.18, price: 0.03 },
+    { id: "supply", icon: "🚚", name: "Поставщики", desc: "+10% за счёт экономии", max: 2, gain: 0.1, price: 0.04 },
   ];
 
   const BUSINESS = [
-    { id: "stall", icon: "🥤", name: "Ларёк", desc: "Маленькая точка с большим потоком", base: 5000, growth: 1.5, income: 10 },
-    { id: "cafe", icon: "☕", name: "Кафе", desc: "Кофе и выручка каждый день", base: 50000, growth: 1.5, income: 120 },
-    { id: "shop", icon: "🏪", name: "Магазин", desc: "Полноценная торговля", base: 500000, growth: 1.5, income: 1500 },
-    { id: "mall", icon: "🏬", name: "Торговый центр", desc: "Много арендаторов сразу", base: 5000000, growth: 1.5, income: 20000 },
-    { id: "factory", icon: "🏭", name: "Завод", desc: "Своё производство", base: 50000000, growth: 1.5, income: 250000 },
-    { id: "oil", icon: "🛢️", name: "Нефтекомпания", desc: "Чёрное золото идёт в гору", base: 500000000, growth: 1.5, income: 3000000 },
-    { id: "bank", icon: "🏦", name: "Банк", desc: "Проценты со всего города", base: 2500000000, growth: 1.5, income: 15000000 },
-    { id: "corp", icon: "🌐", name: "Корпорация", desc: "Глобальная сеть компаний", base: 10000000000, growth: 1.5, income: 60000000 },
+    { id: "stall", icon: "🥤", name: "Ларёк", desc: "Маленькая точка с большим потоком", base: 5000, growth: 1.5, income: 6 },
+    { id: "cafe", icon: "☕", name: "Кафе", desc: "Кофе и выручка каждый день", base: 50000, growth: 1.5, income: 55 },
+    { id: "shop", icon: "🏪", name: "Магазин", desc: "Полноценная торговля", base: 500000, growth: 1.5, income: 550 },
+    { id: "mall", icon: "🏬", name: "Торговый центр", desc: "Много арендаторов сразу", base: 5000000, growth: 1.5, income: 5500 },
+    { id: "factory", icon: "🏭", name: "Завод", desc: "Своё производство", base: 50000000, growth: 1.5, income: 55000 },
+    { id: "oil", icon: "🛢️", name: "Нефтекомпания", desc: "Чёрное золото идёт в гору", base: 500000000, growth: 1.5, income: 550000 },
+    { id: "bank", icon: "🏦", name: "Банк", desc: "Проценты со всего города", base: 2500000000, growth: 1.5, income: 2500000 },
+    { id: "corp", icon: "🌐", name: "Корпорация", desc: "Глобальная сеть компаний", base: 10000000000, growth: 1.5, income: 10000000 },
   ];
 
   const el = {
@@ -151,13 +154,14 @@
     return {
       coins: 0, total: 0, taps: 0, crits: 0,
       owned: {}, items: {}, stocks: {}, business: {}, gifted: {}, received: {},
-      market: {}, control: {}, bizUp: {}, migrated5b: true, updated: 0,
+      market: {}, control: {}, bizUp: {}, migrated5b: true, updated: 0, econ: 2,
     };
   }
 
   function normalizeSave(saved) {
     const base = fresh();
-    if (!saved || typeof saved !== "object") return base;
+    // Старые сохранения от прежней экономики не переносим — всем старт с нуля.
+    if (!saved || typeof saved !== "object" || saved.econ !== 2) return base;
     return {
       coins: Number(saved.coins) || 0,
       total: Number(saved.total) || 0,
@@ -174,6 +178,7 @@
       received: saved.received && typeof saved.received === "object" ? saved.received : {},
       migrated5b: saved.migrated5b === true,
       updated: Number(saved.updated) || 0,
+      econ: 2,
     };
   }
 
@@ -207,13 +212,13 @@
   let saveTimer = 0;
 
   // Общий топ: хранилище без регистрации, данные доступны всем посетителям.
-  const TOP_URL = "https://mantledb.sh/v2/rzagasanov-mining-top/leaderboard";
+  const TOP_URL = "https://mantledb.sh/v2/rzagasanov-mining-top-v2/leaderboard";
   const NICK_KEY = "mineNick_v1";
   const PLAYER_KEY = "minePlayerId_v1";
   const ACCOUNT_KEY = "mineAccount_v1";
   const ACCOUNT_BASE = "https://mantledb.sh/v2/rzagasanov-acc-";
   const GUEST_KEY = "mineGuestBackup_v1";
-  const GIFTS_BASE = "https://mantledb.sh/v2/rzagasanov-gifts/";
+  const GIFTS_BASE = "https://mantledb.sh/v2/rzagasanov-gifts-v2/";
   let publishTimer = 0;
   let accountTimer = 0;
   let topData = {};
@@ -290,21 +295,23 @@
 
   function rates() {
     let tap = 1;
-    let sec = 0;
+    let buffSec = 0;
     let mult = 1;
     BUFFS.forEach((buff) => {
       const count = save.owned[buff.id] || 0;
       if (!count) return;
       if (buff.kind === "tap") tap += buff.amount * count;
-      if (buff.kind === "sec") sec += buff.amount * count;
+      if (buff.kind === "sec") buffSec += buff.amount * count;
       if (buff.kind === "mult") mult *= Math.pow(buff.amount, count);
     });
+    // Ускоритель усиливает только тапы и бафы, бизнес и дивиденды не удваивает.
+    let sec = buffSec * mult;
     BUSINESS.forEach((item) => {
       const count = save.business[item.id] || 0;
       if (count) sec += businessIncome(item, count);
     });
     sec += dividendsIncome();
-    return { tap: tap * mult, sec: sec * mult };
+    return { tap: tap * mult, sec: sec };
   }
 
   function buffCost(buff) {
@@ -405,7 +412,7 @@
         '<span class="si-icon">' + item.icon + "</span>" +
         '<span class="si-body"><b>' + item.name + "</b><small>" + item.desc + "</small>" +
         "<em>Точек: " + count + " / " + BIZ_MAX + " · +" + fmt(income) + " ₿/сек</em>" +
-        (count >= BIZ_MAX ? '<span class="biz-franchise">🏆 Франшиза ×1.5</span>' : "") +
+        (count >= BIZ_MAX ? '<span class="biz-franchise">🏆 Франшиза ×1.2</span>' : "") +
         "</span>" +
         '<span class="si-price">' + (maxed ? "МАКС" : fmt(cost) + " ₿") + "</span>" +
         "</button>" +
@@ -433,11 +440,11 @@
   }
 
   function controlCost(stock, config, level) {
-    return Math.ceil((stock.cap * config.price * Math.pow(level + 1, 1.6)) / 5) * 5;
+    return Math.ceil(stock.cap * config.price * Math.pow(level + 1, 1.6));
   }
 
   function pushCost(stock) {
-    return Math.max(5, Math.round(stockPrices[stock.id] * 8));
+    return Math.max(5, Math.round(stockPrices[stock.id] * 15));
   }
 
   function dividendsIncome() {
@@ -529,16 +536,16 @@
   }
 
   function bizUpgradeCost(item, config, level) {
-    return Math.ceil((item.base * config.price * Math.pow(level + 1, 1.7)) / 5) * 5;
+    return Math.ceil(item.base * config.price * Math.pow(1.8, level));
   }
 
   function businessIncome(item, count) {
     const up = bizUpOf(item.id);
     const mode = BIZ_PRICES[up.price] || BIZ_PRICES[1];
-    const manager = 1 + (up.manager || 0) * 0.25;
-    const equip = 1 + (up.equip || 0) * 0.4;
-    const supply = 1 + (up.supply || 0) * 0.12;
-    const franchise = count >= BIZ_MAX ? 1.5 : 1;
+    const manager = 1 + (up.manager || 0) * 0.12;
+    const equip = 1 + (up.equip || 0) * 0.18;
+    const supply = 1 + (up.supply || 0) * 0.1;
+    const franchise = count >= BIZ_MAX ? 1.2 : 1;
     return item.income * count * mode.mult * manager * equip * supply * franchise;
   }
 
@@ -576,8 +583,9 @@
     const held = save.stocks[stock.id];
     const heldQty = held ? held.qty : 0;
     const goods = GOODS_MODES[ctl.goods] || GOODS_MODES[1];
-    const buybackCost = Math.ceil((capNow(stock) * 0.002) / 5) * 5;
-    const sellGain = Math.ceil((capNow(stock) * 0.4) / 5) * 5;
+    const myShares = heldQty * stockPrices[stock.id];
+    const buybackCost = Math.ceil(myShares * 0.5);
+    const sellGain = Math.ceil(myShares * 0.7);
 
     el.manageContent.innerHTML =
       '<div class="manage-head">' +
@@ -614,10 +622,10 @@
         mode.name + "<small>прибыль ×" + mode.income + " · рост ×" + mode.growth + "</small></button>"
       ).join("") +
       "</div>" +
-      '<p class="mg-note">Сейчас: <b>' + goods.name + "</b>. Высокая цена даёт больше дивидендов, но замедляет рост курса.</p>" +
+      '<p class="mg-note">Сейчас: <b>' + goods.name + "</b>. Низкая цена привлекает покупателей — курс растёт быстрее, но прибыль меньше. Премиум даёт больше дивидендов, но замедляет рост.</p>" +
       '<div class="mg-extra">' +
-      '<button type="button" data-mg="buyback"' + (save.coins < buybackCost ? " disabled" : "") + ">♻️ Выкупить акции · " + fmt(buybackCost) + " ₿<small>Курс +10%</small></button>" +
-      '<button type="button" class="danger" data-mg="sell-company">💼 Продать контроль · +' + fmt(sellGain) + " ₿<small>Рынок снова открыт</small></button>" +
+      '<button type="button" data-mg="buyback"' + (save.coins < buybackCost ? " disabled" : "") + ">♻️ Выкупить акции · " + fmt(buybackCost) + " ₿<small>Курс +10%, потратишь 50% стоимости акций</small></button>" +
+      '<button type="button" class="danger" data-mg="sell-company">💼 Продать контроль · +' + fmt(sellGain) + " ₿<small>Вернём 70% цены твоих акций</small></button>" +
       "</div>";
   }
 
@@ -637,7 +645,7 @@
       '<div class="manage-stats">' +
       "<span>Доход: <b>+" + fmt(income) + " ₿/сек</b></span>" +
       "<span>Ценовая политика: <b>" + mode.name + "</b></span>" +
-      "<span>Франшиза: <b>" + (count >= BIZ_MAX ? "🏆 активна ×1.5" : count + " / " + BIZ_MAX) + "</b></span>" +
+      "<span>Франшиза: <b>" + (count >= BIZ_MAX ? "🏆 активна ×1.2" : count + " / " + BIZ_MAX) + "</b></span>" +
       "</div>" +
       "<h4>🧑‍💼 Улучшение точек</h4>" +
       '<div class="mg-grid">' +
@@ -663,7 +671,7 @@
         priceMode.name + "<small>" + priceMode.desc + " · ×" + priceMode.mult + "</small></button>"
       ).join("") +
       "</div>" +
-      '<p class="mg-note">Улучшения действуют на все точки этого бизнеса. Купи 5 точек — включится франшиза с бонусом ×1.5.</p>' +
+      '<p class="mg-note">Улучшения действуют на все точки этого бизнеса. Купи 5 точек — включится франшиза с бонусом ×1.2.</p>' +
       '<div class="mg-extra"><button type="button" class="danger" data-mg="biz-close">Готово</button></div>';
   }
 
@@ -879,8 +887,9 @@
     if (mg === "buyback") {
       const stock = STOCKS.find((entry) => entry.id === id);
       if (!stock) return;
-      const cost = Math.ceil((capNow(stock) * 0.002) / 5) * 5;
-      if (save.coins < cost) {
+      const held = save.stocks[id];
+      const cost = Math.ceil((held ? held.qty : 0) * stockPrices[id] * 0.5);
+      if (cost < 1 || save.coins < cost) {
         shake(button);
         return;
       }
@@ -896,7 +905,8 @@
     if (mg === "sell-company") {
       const stock = STOCKS.find((entry) => entry.id === id);
       if (!stock) return;
-      save.coins += Math.ceil((capNow(stock) * 0.4) / 5) * 5;
+      const held = save.stocks[id];
+      save.coins += Math.ceil((held ? held.qty : 0) * stockPrices[id] * 0.7);
       delete save.control[id];
       save.market[id] = stock.supply;
       closeManage();
@@ -1520,6 +1530,7 @@
     else if (el.nickOverlay.classList.contains("show")) closeAuthModal();
   });
 
+  if (!save.updated) saveNow();
   updateAccountUI();
   topRefresh();
   topPublish();
