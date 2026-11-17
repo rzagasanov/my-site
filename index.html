@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Моя страница — игры и музыка</title>
   <meta name="description" content="Фото, любимая музыка, крестики-нолики и майнинг токенов.">
-  <link rel="stylesheet" href="style.css?v=15">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
   <button class="profile-btn" id="profile-btn" type="button" aria-label="Открыть аккаунт" title="Войти или зарегистрироваться">👤</button>
@@ -49,10 +49,9 @@
     </section>
 
     <section class="game-hub" id="games">
-      <div class="tabs" role="tablist" aria-label="Выбор раздела">
+      <div class="tabs" role="tablist" aria-label="Выбор игры">
         <button class="tab active" type="button" role="tab" data-game="tic" aria-selected="true">❌⭕ Крестики</button>
         <button class="tab" type="button" role="tab" data-game="mining" aria-selected="false">₿ Майнинг</button>
-        <button class="tab" type="button" role="tab" data-game="pay" aria-selected="false">💳 Поддержать</button>
       </div>
 
       <div class="game-panel active" id="panel-tic">
@@ -175,55 +174,6 @@
           <button class="reset small" id="mine-reset" type="button">Сбросить прогресс</button>
         </div>
       </div>
-
-      <div class="game-panel" id="panel-pay">
-        <div class="game pay">
-          <h2 class="game-title">Поддержать сайт 💳</h2>
-          <p class="game-sub">Если сайт понравился — выбери удобный способ.</p>
-
-          <div class="pay-grid">
-            <button class="pay-card" type="button" data-pay="cards">
-              <span class="pay-icon">💳</span>
-              <span class="pay-body">
-                <b>Карты России</b>
-                <small>Visa · Mastercard · МИР</small>
-              </span>
-              <span class="pay-cta">Пока не настроено</span>
-            </button>
-
-            <button class="pay-card" type="button" data-pay="sbp">
-              <span class="pay-icon">⚡</span>
-              <span class="pay-body">
-                <b>СБП</b>
-                <small>Быстрый платёж по QR-коду</small>
-              </span>
-              <span class="pay-cta">Пока не настроено</span>
-            </button>
-
-            <button class="pay-card" type="button" data-pay="foreign">
-              <span class="pay-icon">🌍</span>
-              <span class="pay-body">
-                <b>Иностранные карты</b>
-                <small>Карты банков других стран</small>
-              </span>
-              <span class="pay-cta">Пока не настроено</span>
-            </button>
-
-            <button class="pay-card" type="button" data-pay="crypto">
-              <span class="pay-icon">₿</span>
-              <span class="pay-body">
-                <b>Криптовалюта</b>
-                <small>USDT (TRC20) · BTC</small>
-              </span>
-              <span class="pay-cta">Пока не настроено</span>
-            </button>
-          </div>
-
-          <div class="pay-note">
-            <b>Важно:</b> это добровольная поддержка сайта, а не обмен или покупка игровых ₿. Криптовалюту можно отправить только как донат/перевод — в России она не является средством оплаты товаров и услуг.
-          </div>
-        </div>
-      </div>
     </section>
   </main>
 
@@ -270,9 +220,8 @@
     </div>
   </div>
 
-  <script src="script.js?v=15"></script>
-  <script src="player.js?v=15"></script>
-  <script src="mining.js?v=15"></script>
-  <script src="pay.js?v=15"></script>
+  <script src="script.js?v=14"></script>
+  <script src="player.js?v=14"></script>
+  <script src="mining.js?v=14"></script>
 </body>
 </html>
