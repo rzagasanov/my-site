@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Моя страница — игры и музыка</title>
   <meta name="description" content="Фото, любимая музыка, крестики-нолики и майнинг токенов.">
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
+  <button class="profile-btn" id="profile-btn" type="button" aria-label="Открыть аккаунт" title="Войти или зарегистрироваться">👤</button>
+
   <main class="page">
     <section class="hero">
       <div class="photo-wrap">
@@ -193,9 +195,23 @@
       <div class="nick-error" id="nick-error"></div>
       <button id="nick-save" type="button">Войти</button>
       <button id="nick-register" class="register" type="button">Создать аккаунт</button>
-      <small>Пароль хранится только в виде защищённого отпечатка. При входе на другом устройстве введи тот же ник и пароль.</small>
+      <button id="guest-play" class="guest-play" type="button">Играть без входа</button>
+      <small>Можно играть и без аккаунта — прогресс сохранится на этом устройстве. Если зарегистрируешься, он сразу переедет на аккаунт.</small>
     </div>
   </div>
+
+  <div class="gift-overlay" id="gift-overlay" aria-hidden="true">
+    <div class="gift-modal">
+      <button class="gift-close" id="gift-close" type="button" aria-label="Закрыть">✕</button>
+      <h2 id="gift-title">🎁 Подарить вещь</h2>
+      <p id="gift-sub"></p>
+      <div class="gift-list" id="gift-list"></div>
+      <div class="gift-error" id="gift-error"></div>
+      <small>Подаренную вещь нельзя продать и подарить снова.</small>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
 
   <div class="manage-overlay" id="manage-overlay" aria-hidden="true">
     <div class="manage-modal">
@@ -204,8 +220,8 @@
     </div>
   </div>
 
-  <script src="script.js?v=10"></script>
-  <script src="player.js?v=10"></script>
-  <script src="mining.js?v=10"></script>
+  <script src="script.js?v=12"></script>
+  <script src="player.js?v=12"></script>
+  <script src="mining.js?v=12"></script>
 </body>
 </html>

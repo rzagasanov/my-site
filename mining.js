@@ -134,6 +134,15 @@
     accountLogout: document.getElementById("account-logout"),
     topList: document.getElementById("top-list"),
     topRefresh: document.getElementById("top-refresh"),
+    profileBtn: document.getElementById("profile-btn"),
+    guestPlay: document.getElementById("guest-play"),
+    giftOverlay: document.getElementById("gift-overlay"),
+    giftClose: document.getElementById("gift-close"),
+    giftTitle: document.getElementById("gift-title"),
+    giftSub: document.getElementById("gift-sub"),
+    giftList: document.getElementById("gift-list"),
+    giftError: document.getElementById("gift-error"),
+    toast: document.getElementById("toast"),
   };
 
   if (!el.coin) return;
@@ -141,7 +150,7 @@
   function fresh() {
     return {
       coins: 0, total: 0, taps: 0, crits: 0,
-      owned: {}, items: {}, stocks: {}, business: {},
+      owned: {}, items: {}, stocks: {}, business: {}, gifted: {}, received: {},
       market: {}, control: {}, bizUp: {}, migrated5b: true, updated: 0,
     };
   }
@@ -161,6 +170,8 @@
       market: saved.market && typeof saved.market === "object" ? saved.market : {},
       control: saved.control && typeof saved.control === "object" ? saved.control : {},
       bizUp: saved.bizUp && typeof saved.bizUp === "object" ? saved.bizUp : {},
+      gifted: saved.gifted && typeof saved.gifted === "object" ? saved.gifted : {},
+      received: saved.received && typeof saved.received === "object" ? saved.received : {},
       migrated5b: saved.migrated5b === true,
       updated: Number(saved.updated) || 0,
     };
@@ -201,6 +212,8 @@
   const PLAYER_KEY = "minePlayerId_v1";
   const ACCOUNT_KEY = "mineAccount_v1";
   const ACCOUNT_BASE = "https://mantledb.sh/v2/rzagasanov-acc-";
+  const GUEST_KEY = "mineGuestBackup_v1";
+  const GIFTS_BASE = "https://mantledb.sh/v2/rzagasanov-gifts/";
   let publishTimer = 0;
   let accountTimer = 0;
   let topData = {};
@@ -217,6 +230,11 @@
     storeSet(PLAYER_KEY, playerId);
   }
   let nick = storeGet(NICK_KEY) || "";
+  if (!nick) {
+    // Гость может играть сразу — без входа и без пароля.
+    nick = "Гость" + Math.random().toString(36).slice(2, 6).toUpperCase();
+    storeSet(NICK_KEY, nick);
+  }
 
   function loadSession() {
     try {
@@ -332,16 +350,29 @@
       );
     }).join("");
 
+    const itemFace = (item) => item.photo
+      ? '<span class="ic-photo-wrap"><img class="ic-photo" src="' + item.photo + '" alt="' + item.name + '"></span>'
+      : '<span class="ic-icon">' + item.icon + "</span>";
+
     el.items.innerHTML = ITEMS.map((item) => {
       const owned = Boolean(save.items[item.id]);
-      const can = !owned && save.coins >= item.price;
+      const gifted = Boolean(save.gifted[item.id]);
+      if (owned) {
+        return (
+          '<button class="item-card owned' + (gifted ? "" : " sell") + '" type="button"' +
+          (gifted ? " disabled" : ' data-sell="' + item.id + '"') + ">" +
+          itemFace(item) +
+          "<b>" + item.name + "</b><small>" + item.desc + "</small>" +
+          '<span class="ic-price">' + (gifted ? "🎁 НЕ ПРОДАЁТСЯ" : "Продать за " + fmt(Math.floor(item.price / 2)) + " ₿") + "</span>" +
+          "</button>"
+        );
+      }
+      const can = save.coins >= item.price;
       return (
-        '<button class="item-card' + (owned ? " owned" : "") + (can ? " can" : "") + '" type="button" data-item="' + item.id + '"' + (owned ? " disabled" : "") + ">" +
-        (item.photo
-          ? '<span class="ic-photo-wrap"><img class="ic-photo" src="' + item.photo + '" alt="' + item.name + '"></span>'
-          : '<span class="ic-icon">' + item.icon + "</span>") +
+        '<button class="item-card' + (can ? " can" : "") + '" type="button" data-item="' + item.id + '">' +
+        itemFace(item) +
         "<b>" + item.name + "</b><small>" + item.desc + "</small>" +
-        '<span class="ic-price">' + (owned ? "ЕСТЬ ✓" : fmt(item.price) + " ₿") + "</span>" +
+        '<span class="ic-price">' + fmt(item.price) + " ₿" + "</span>" +
         "</button>"
       );
     }).join("");
@@ -687,6 +718,18 @@
   });
 
   el.items.addEventListener("click", (event) => {
+    const sellButton = event.target.closest("[data-sell]");
+    if (sellButton) {
+      const item = ITEMS.find((entry) => entry.id === sellButton.dataset.sell);
+      if (!item || !save.items[item.id] || save.gifted[item.id]) return;
+      const gain = Math.floor(item.price / 2);
+      delete save.items[item.id];
+      save.coins += gain;
+      renderAll();
+      saveNow();
+      toast("Продал «" + item.name + "» за " + fmt(gain) + " ₿");
+      return;
+    }
     const button = event.target.closest("[data-item]");
     if (!button) return;
     const item = ITEMS.find((entry) => entry.id === button.dataset.item);
@@ -1019,6 +1062,16 @@
       score.className = "top-score";
       score.textContent = fmt(Number(item.score)) + " ₿";
       row.append(place, name, score);
+      if (id !== playerId) {
+        const gift = document.createElement("button");
+        gift.className = "top-gift";
+        gift.type = "button";
+        gift.textContent = "🎁";
+        gift.title = "Подарить вещь из коллекции";
+        gift.dataset.gift = id;
+        gift.dataset.giftNick = String(item.nick || "Игрок");
+        row.appendChild(gift);
+      }
       el.topList.appendChild(row);
     });
   }
@@ -1065,6 +1118,154 @@
     }, 6000);
   }
 
+  // ===== Подарки из коллекции =====
+  function giftUrl(recipientId) {
+    return GIFTS_BASE + encodeURIComponent(recipientId);
+  }
+
+  async function giftsRead(recipientId) {
+    const response = await fetch(giftUrl(recipientId), { cache: "no-store" });
+    if (response.status === 404) return {};
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    return data && typeof data === "object" ? data : {};
+  }
+
+  async function giftsWrite(recipientId, list) {
+    const response = await fetch(giftUrl(recipientId), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(list),
+    });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+  }
+
+  function toast(message) {
+    el.toast.textContent = message;
+    el.toast.classList.add("show");
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => el.toast.classList.remove("show"), 3800);
+  }
+
+  let giftTarget = null;
+
+  function openGiftModal(recipientId, recipientName) {
+    giftTarget = { id: recipientId, nick: recipientName };
+    el.giftTitle.textContent = "🎁 Подарить: " + recipientName;
+    el.giftSub.textContent = "Выбери вещь из своей коллекции";
+    el.giftError.textContent = "";
+    el.giftList.textContent = "";
+    const available = ITEMS.filter((item) => save.items[item.id] && !save.gifted[item.id]);
+    if (!available.length) {
+      const empty = document.createElement("div");
+      empty.className = "gift-empty";
+      empty.textContent = "Пока нечего дарить. Купи вещь в магазине «Коллекция» — подаренные вещи подарить снова нельзя.";
+      el.giftList.appendChild(empty);
+    } else {
+      available.forEach((item) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "gift-item";
+        button.dataset.giftItem = item.id;
+        const face = document.createElement("span");
+        face.className = "gi-face";
+        if (item.photo) {
+          const img = document.createElement("img");
+          img.src = item.photo;
+          img.alt = item.name;
+          face.appendChild(img);
+        } else {
+          face.textContent = item.icon;
+        }
+        const body = document.createElement("span");
+        body.className = "gi-body";
+        const title = document.createElement("b");
+        title.textContent = item.name;
+        const sub = document.createElement("small");
+        sub.textContent = fmt(item.price) + " ₿ · отдать совсем";
+        body.append(title, sub);
+        const go = document.createElement("span");
+        go.className = "gi-go";
+        go.textContent = "➜";
+        button.append(face, body, go);
+        el.giftList.appendChild(button);
+      });
+    }
+    el.giftOverlay.classList.add("show");
+    el.giftOverlay.setAttribute("aria-hidden", "false");
+  }
+
+  function closeGiftModal() {
+    giftTarget = null;
+    el.giftOverlay.classList.remove("show");
+    el.giftOverlay.setAttribute("aria-hidden", "true");
+  }
+
+  async function sendGift(itemId) {
+    if (!giftTarget) return;
+    const item = ITEMS.find((entry) => entry.id === itemId);
+    if (!item || !save.items[itemId] || save.gifted[itemId]) return;
+    const target = giftTarget;
+    el.giftError.textContent = "Отправляю…";
+    try {
+      const list = await giftsRead(target.id);
+      const giftId = "g" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      list[giftId] = { from: playerId, fromNick: nick, item: itemId, ts: Date.now() };
+      await giftsWrite(target.id, list);
+      el.giftError.textContent = "";
+      delete save.items[itemId];
+      saveNow();
+      renderAll();
+      closeGiftModal();
+      toast("🎁 «" + item.name + "» отправлен игроку " + target.nick);
+    } catch (error) {
+      el.giftError.textContent = "Не удалось отправить — попробуй ещё раз";
+    }
+  }
+
+  async function collectGifts() {
+    try {
+      const list = await giftsRead(playerId);
+      const ids = Object.keys(list);
+      if (!ids.length) return;
+      const rest = {};
+      let got = 0;
+      ids.forEach((giftId) => {
+        const gift = list[giftId];
+        if (!gift || !gift.item || save.received[giftId]) return;
+        const item = ITEMS.find((entry) => entry.id === gift.item);
+        if (!item) {
+          rest[giftId] = gift;
+          return;
+        }
+        save.received[giftId] = true;
+        save.items[item.id] = true;
+        save.gifted[item.id] = { from: gift.fromNick || "Другой игрок", ts: gift.ts || Date.now() };
+        got += 1;
+      });
+      await giftsWrite(playerId, rest);
+      if (got) {
+        saveNow();
+        renderAll();
+        toast("🎁 Тебе подарили " + got + " вещь! Она в коллекции, но не продаётся.");
+      }
+    } catch (error) {
+      /* офлайн — попробуем позже */
+    }
+  }
+
+  el.topList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-gift]");
+    if (!button) return;
+    openGiftModal(button.dataset.gift, button.dataset.giftNick);
+  });
+  el.giftClose.addEventListener("click", closeGiftModal);
+  el.giftOverlay.addEventListener("click", (event) => {
+    if (event.target === el.giftOverlay) closeGiftModal();
+    const button = event.target.closest("[data-gift-item]");
+    if (button) sendGift(button.dataset.giftItem);
+  });
+
   // ===== Аккаунт: ник + пароль, прогресс в облаке =====
   function accountKey(name) {
     return name.trim().replace(/\s+/g, "_").toLowerCase();
@@ -1105,12 +1306,23 @@
   }
 
   function updateAccountUI() {
-    el.accountName.textContent = session ? "👤 " + session.nick : "👤 Гость";
+    el.accountName.textContent = session ? "👤 " + session.nick : "👤 " + nick + " (без входа)";
     el.accountLogout.hidden = !session;
+    el.nickChange.textContent = session ? "🔄 Другой аккаунт" : "🔑 Войти или зарегистрироваться";
+    el.profileBtn.title = session ? "Аккаунт: " + session.nick : "Войти или зарегистрироваться";
+  }
+
+  function backupGuest() {
+    if (session) return;
+    try {
+      storeSet(GUEST_KEY, JSON.stringify({ save: save, nick: nick, playerId: playerId }));
+    } catch (error) {
+      /* игнорируем */
+    }
   }
 
   function showAuthModal(prefill) {
-    el.nickInput.value = prefill || nick || "";
+    el.nickInput.value = prefill !== undefined ? prefill : (session ? session.nick : "");
     el.passInput.value = "";
     el.nickError.textContent = "";
     el.nickOverlay.classList.add("show");
@@ -1163,12 +1375,16 @@
       const salt = randomHex(16);
       const key = await deriveKey(pass, salt);
       const id = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      // Гостевой прогресс полноценно переезжает на новый аккаунт.
+      backupGuest();
       await accountWrite(name, { nick: name, key: key, salt: salt, playerId: id, save: save, updated: Date.now() });
       applySession(name, key, salt, id);
+      storeSet(GUEST_KEY, "");
       closeAuthModal();
       saveNow();
       renderAll();
       topPublish();
+      toast("Готово! Твой прогресс без входа теперь на аккаунте «" + name + "».");
     } catch (error) {
       el.nickError.textContent = "Не удалось создать аккаунт — попробуй ещё раз";
     }
@@ -1196,6 +1412,8 @@
         el.nickError.textContent = "Неверный пароль";
         return;
       }
+      // Если до входа был гостевой прогресс — сохраним его на всякий случай.
+      backupGuest();
       applySession(record.nick || name, key, record.salt || "", record.playerId || playerId);
       save = normalizeSave(record.save);
       saveNow();
@@ -1250,44 +1468,79 @@
   }
 
   function logoutAccount() {
+    accountPush();
+    let backup = null;
+    try { backup = JSON.parse(storeGet(GUEST_KEY) || "null"); } catch (error) { /* игнорируем */ }
     storeSet(ACCOUNT_KEY, "");
     session = null;
-    nick = "";
-    playerId = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    if (backup && backup.save) {
+      save = normalizeSave(backup.save);
+      nick = backup.nick || nick;
+      playerId = backup.playerId || playerId;
+      storeSet(GUEST_KEY, "");
+    } else {
+      // Гостевого бэкапа нет — оставляем текущую копию как гостевую.
+      nick = "Гость" + Math.random().toString(36).slice(2, 6).toUpperCase();
+      playerId = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+    storeSet(NICK_KEY, nick);
     storeSet(PLAYER_KEY, playerId);
+    saveNow();
+    renderAll();
     updateAccountUI();
-    showAuthModal();
+    toast("Вышли из аккаунта. Прогресс аккаунта остался в облаке, дальше можно играть без входа.");
   }
 
   el.nickSave.addEventListener("click", loginAccount);
   el.nickRegister.addEventListener("click", registerAccount);
+  el.guestPlay.addEventListener("click", () => {
+    closeAuthModal();
+    toast("Играй без входа — прогресс сохранится на этом устройстве.");
+  });
   el.nickInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") loginAccount();
   });
   el.passInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") loginAccount();
   });
-  el.nickChange.addEventListener("click", () => showAuthModal(nick));
+  el.profileBtn.addEventListener("click", () => showAuthModal());
+  el.nickChange.addEventListener("click", () => showAuthModal(session ? session.nick : ""));
   el.accountLogout.addEventListener("click", logoutAccount);
   el.topRefresh.addEventListener("click", () => {
     topRefresh();
     topPublish();
+    collectGifts();
   });
 
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (el.giftOverlay.classList.contains("show")) closeGiftModal();
+    else if (el.nickOverlay.classList.contains("show")) closeAuthModal();
+  });
+
+  updateAccountUI();
+  topRefresh();
+  topPublish();
+  collectGifts();
+
   if (session) {
-    updateAccountUI();
     accountPull().then(() => {
       renderAll();
       topRefresh();
       topPublish();
+      collectGifts();
     });
   } else {
-    showAuthModal();
-    topRefresh();
+    setTimeout(() => {
+      if (!el.toast.classList.contains("show")) {
+        toast("Играй без входа! Хочешь аккаунт — нажми 👤 в правом верхнем углу.");
+      }
+    }, 4000);
   }
 
   setInterval(() => {
     if (nick) topPublish();
+    collectGifts();
   }, 30000);
 
   setInterval(() => {

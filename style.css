@@ -905,6 +905,10 @@ body {
   color: var(--accent);
 }
 
+.item-card.sell .ic-price {
+  color: #9be9c8;
+}
+
 .collection-shelf {
   margin-top: 16px;
   padding-top: 14px;
@@ -1669,6 +1673,36 @@ body {
   cursor: pointer;
 }
 
+/* ===== Кнопка профиля в углу ===== */
+.profile-btn {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 8900;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  color: var(--text);
+  border-radius: 50%;
+  border: 1px solid rgba(94, 231, 255, 0.4);
+  background: rgba(19, 26, 43, 0.9);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.profile-btn:hover {
+  transform: scale(1.06);
+  border-color: var(--accent);
+}
+
+.profile-btn:active {
+  transform: scale(0.95);
+}
+
 /* ===== Ввод ника ===== */
 .nick-overlay {
   position: fixed;
@@ -1733,6 +1767,13 @@ body {
   background: rgba(255, 255, 255, 0.06);
 }
 
+.nick-modal button.guest-play {
+  margin-top: 7px;
+  color: #9be9c8;
+  border: 1px solid rgba(110, 231, 183, 0.3);
+  background: rgba(110, 231, 183, 0.08);
+}
+
 .account-line {
   display: flex;
   align-items: center;
@@ -1756,6 +1797,185 @@ body {
 
 .account-line button[hidden] {
   display: none;
+}
+
+.top-row {
+  grid-template-columns: 26px 1fr auto 26px;
+}
+
+.top-gift {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 24px;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 211, 110, 0.35);
+  background: rgba(255, 211, 110, 0.08);
+  cursor: pointer;
+}
+
+/* ===== Подарки ===== */
+.gift-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9400;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(3, 6, 14, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.gift-overlay.show { display: flex; }
+
+.gift-modal {
+  position: relative;
+  width: min(390px, 100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 22px 18px 18px;
+  text-align: center;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 211, 110, 0.35);
+  background: #131a2b;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+}
+
+.gift-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  color: var(--muted);
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.gift-modal h2 {
+  margin: 0 30px 6px 0;
+  font-size: 19px;
+}
+
+.gift-modal p {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gift-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.gift-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  color: var(--text);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.gift-item:hover {
+  border-color: rgba(255, 211, 110, 0.5);
+}
+
+.gift-item .gi-face {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 22px;
+}
+
+.gift-item .gi-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gift-item .gi-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gift-item b,
+.gift-item small {
+  display: block;
+}
+
+.gift-item small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.gift-item .gi-go {
+  color: #ffe083;
+  font-size: 16px;
+}
+
+.gift-empty {
+  padding: 16px 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gift-error {
+  min-height: 16px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #ff9d90;
+}
+
+.gift-modal > small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ===== Всплывающее уведомление ===== */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  z-index: 9800;
+  max-width: min(340px, calc(100% - 32px));
+  padding: 11px 16px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--text);
+  border-radius: 14px;
+  border: 1px solid rgba(94, 231, 255, 0.35);
+  background: rgba(19, 26, 43, 0.97);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 12px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 .nick-error {
