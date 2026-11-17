@@ -24,6 +24,7 @@ let state = Array(9).fill("");
 let finished = false;
 let busy = false;
 let score = { player: 0, draw: 0, ai: 0 };
+let difficulty = "easy";
 
 function render() {
   cells.forEach((cell, index) => {
@@ -119,13 +120,26 @@ function pickBestMove(mark) {
   return free[Math.floor(Math.random() * free.length)];
 }
 
+function pickMove(mark) {
+  const free = emptyCells();
+  if (!free.length) return undefined;
+
+  const blunder = difficulty === "easy" ? 0.8 : difficulty === "medium" ? 0.4 : 0.22;
+  if (Math.random() < blunder) {
+    return free[Math.floor(Math.random() * free.length)];
+  }
+
+  const best = pickBestMove(mark);
+  return best === undefined ? free[Math.floor(Math.random() * free.length)] : best;
+}
+
 function aiMove() {
   busy = true;
   render();
   statusEl.textContent = "Компьютер думает…";
 
   setTimeout(() => {
-    const index = pickBestMove(AI);
+    const index = pickMove(AI);
     if (index === undefined) {
       busy = false;
       return;
@@ -166,6 +180,15 @@ cells.forEach((cell) => {
 });
 
 resetBtn.addEventListener("click", startNewGame);
+
+// Уровень сложности бота
+document.querySelectorAll(".diff").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".diff").forEach((item) => item.classList.toggle("active", item === button));
+    difficulty = button.dataset.level;
+    startNewGame();
+  });
+});
 
 render();
 

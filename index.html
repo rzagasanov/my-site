@@ -57,6 +57,15 @@
           <h2 class="game-title">Крестики-нолики</h2>
           <p class="game-sub">Ты играешь за <span class="x-mark">X</span>, компьютер — за <span class="o-mark">O</span></p>
 
+          <div class="difficulty">
+            <span>Сложность:</span>
+            <div class="diff-buttons">
+              <button class="diff active" type="button" data-level="easy">Лёгкий</button>
+              <button class="diff" type="button" data-level="medium">Средний</button>
+              <button class="diff" type="button" data-level="hard">Сложный</button>
+            </div>
+          </div>
+
           <div class="board" id="board" role="grid" aria-label="Игровое поле 3 на 3">
             <button class="cell" data-index="0" aria-label="Клетка 1"></button>
             <button class="cell" data-index="1" aria-label="Клетка 2"></button>
@@ -134,7 +143,7 @@
           <div class="shop-view item-grid" id="shop-collection"></div>
 
           <div class="collection-shelf">
-            <div class="shelf-title">Моя коллекция <span id="collection-count">0 / 10</span></div>
+            <div class="shelf-title">Моя коллекция <span id="collection-count">0 / 15</span></div>
             <div class="shelf-grid" id="shelf"></div>
           </div>
 

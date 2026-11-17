@@ -22,6 +22,11 @@
     { id: "galaxy", icon: "🌌", name: "Галактика", desc: "Целая вселенная в кармане", price: 27000 },
     { id: "temple", icon: "🏛️", name: "Храм", desc: "Памятник твоему труду", price: 65000 },
     { id: "end", icon: "💫", name: "Сингулярность", desc: "Конец бесконечности", price: 150000 },
+    { id: "fedya", photo: "assets/fedya.jpg", name: "Федя", desc: "Первый из легенд", price: 500000 },
+    { id: "adilet", photo: "assets/adilet.jpg", name: "Адилет", desc: "Редкий экспонат", price: 500000 },
+    { id: "rza", photo: "assets/rza.jpg", name: "Рза", desc: "Тот самый Рза", price: 500000 },
+    { id: "sabir", photo: "assets/sabir.jpg", name: "Сабир", desc: "Хранитель коллекции", price: 500000 },
+    { id: "vugar", photo: "assets/vugar.jpg", name: "Вугар", desc: "Финальный трофей", price: 500000 },
   ];
 
   const el = {
@@ -155,7 +160,9 @@
       const can = !owned && save.coins >= item.price;
       return (
         '<button class="item-card' + (owned ? " owned" : "") + (can ? " can" : "") + '" type="button" data-item="' + item.id + '"' + (owned ? " disabled" : "") + ">" +
-        '<span class="ic-icon">' + item.icon + "</span>" +
+        (item.photo
+          ? '<span class="ic-photo-wrap"><img class="ic-photo" src="' + item.photo + '" alt="' + item.name + '"></span>'
+          : '<span class="ic-icon">' + item.icon + "</span>") +
         "<b>" + item.name + "</b><small>" + item.desc + "</small>" +
         '<span class="ic-price">' + (owned ? "ЕСТЬ ✓" : fmt(item.price) + " ₿") + "</span>" +
         "</button>"
@@ -166,7 +173,10 @@
     el.shelfCount.textContent = ownedCount + " / " + ITEMS.length;
     el.shelf.innerHTML = ITEMS.map((item) => {
       const owned = Boolean(save.items[item.id]);
-      return '<div class="shelf-item ' + (owned ? "owned" : "locked") + '" title="' + (owned ? item.name : "Не найдено") + '">' + (owned ? item.icon : "?") + "</div>";
+      const face = owned && item.photo
+        ? '<img class="shelf-photo" src="' + item.photo + '" alt="' + item.name + '">'
+        : owned ? item.icon : "?";
+      return '<div class="shelf-item ' + (owned ? "owned" : "locked") + '" title="' + (owned ? item.name : "Не найдено") + '">' + face + "</div>";
     }).join("");
   }
 
