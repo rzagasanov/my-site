@@ -168,3 +168,18 @@ cells.forEach((cell) => {
 resetBtn.addEventListener("click", startNewGame);
 
 render();
+
+// Переключение между играми
+const gameTabs = Array.from(document.querySelectorAll(".tab"));
+gameTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    gameTabs.forEach((item) => {
+      const active = item === tab;
+      item.classList.toggle("active", active);
+      item.setAttribute("aria-selected", active ? "true" : "false");
+    });
+    document.querySelectorAll(".game-panel").forEach((panel) => {
+      panel.classList.toggle("active", panel.id === "panel-" + tab.dataset.game);
+    });
+  });
+});

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Моя страница — крестики-нолики</title>
-  <meta name="description" content="Личная страница с мини-игрой крестики-нолики.">
+  <title>Моя страница — игры и музыка</title>
+  <meta name="description" content="Фото, любимая музыка, крестики-нолики и майнинг токенов.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -46,40 +46,101 @@
       </div>
     </section>
 
-    <section class="game" id="game">
-      <h2 class="game-title">Крестики-нолики</h2>
-      <p class="game-sub">Ты играешь за <span class="x-mark">X</span>, компьютер — за <span class="o-mark">O</span></p>
-
-      <div class="board" id="board" role="grid" aria-label="Игровое поле 3 на 3">
-        <button class="cell" data-index="0" aria-label="Клетка 1"></button>
-        <button class="cell" data-index="1" aria-label="Клетка 2"></button>
-        <button class="cell" data-index="2" aria-label="Клетка 3"></button>
-        <button class="cell" data-index="3" aria-label="Клетка 4"></button>
-        <button class="cell" data-index="4" aria-label="Клетка 5"></button>
-        <button class="cell" data-index="5" aria-label="Клетка 6"></button>
-        <button class="cell" data-index="6" aria-label="Клетка 7"></button>
-        <button class="cell" data-index="7" aria-label="Клетка 8"></button>
-        <button class="cell" data-index="8" aria-label="Клетка 9"></button>
+    <section class="game-hub" id="games">
+      <div class="tabs" role="tablist" aria-label="Выбор игры">
+        <button class="tab active" type="button" role="tab" data-game="tic" aria-selected="true">❌⭕ Крестики</button>
+        <button class="tab" type="button" role="tab" data-game="mining" aria-selected="false">₿ Майнинг</button>
       </div>
 
-      <p class="status" id="status">Твой ход</p>
+      <div class="game-panel active" id="panel-tic">
+        <div class="game">
+          <h2 class="game-title">Крестики-нолики</h2>
+          <p class="game-sub">Ты играешь за <span class="x-mark">X</span>, компьютер — за <span class="o-mark">O</span></p>
 
-      <div class="score">
-        <div class="score-item">
-          <span class="score-label">Ты</span>
-          <span class="score-value" id="score-player">0</span>
-        </div>
-        <div class="score-item">
-          <span class="score-label">Ничьи</span>
-          <span class="score-value" id="score-draw">0</span>
-        </div>
-        <div class="score-item">
-          <span class="score-label">Компьютер</span>
-          <span class="score-value" id="score-ai">0</span>
+          <div class="board" id="board" role="grid" aria-label="Игровое поле 3 на 3">
+            <button class="cell" data-index="0" aria-label="Клетка 1"></button>
+            <button class="cell" data-index="1" aria-label="Клетка 2"></button>
+            <button class="cell" data-index="2" aria-label="Клетка 3"></button>
+            <button class="cell" data-index="3" aria-label="Клетка 4"></button>
+            <button class="cell" data-index="4" aria-label="Клетка 5"></button>
+            <button class="cell" data-index="5" aria-label="Клетка 6"></button>
+            <button class="cell" data-index="6" aria-label="Клетка 7"></button>
+            <button class="cell" data-index="7" aria-label="Клетка 8"></button>
+            <button class="cell" data-index="8" aria-label="Клетка 9"></button>
+          </div>
+
+          <p class="status" id="status">Твой ход</p>
+
+          <div class="score">
+            <div class="score-item">
+              <span class="score-label">Ты</span>
+              <span class="score-value" id="score-player">0</span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">Ничьи</span>
+              <span class="score-value" id="score-draw">0</span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">Компьютер</span>
+              <span class="score-value" id="score-ai">0</span>
+            </div>
+          </div>
+
+          <button class="reset" id="reset" type="button">Новая игра</button>
         </div>
       </div>
 
-      <button class="reset" id="reset" type="button">Новая игра</button>
+      <div class="game-panel" id="panel-mining">
+        <div class="game mining">
+          <h2 class="game-title">Майнинг токенов</h2>
+          <p class="game-sub">Тыкай по монете с лицом — добывай токены</p>
+
+          <div class="mine-top">
+            <div class="balance">
+              <span class="balance-label">Баланс</span>
+              <span class="balance-value"><span id="coins">0</span> <small>₿</small></span>
+            </div>
+            <div class="mine-rates">
+              <div><span id="per-tap">+1</span> за тап</div>
+              <div><span id="per-sec">0</span> в секунду</div>
+            </div>
+          </div>
+
+          <div class="coin-stage" id="coin-stage">
+            <button class="coin" id="coin" type="button" aria-label="Майнить токен">
+              <span class="coin-face"><img src="assets/avatar.jpg" alt=""></span>
+              <span class="coin-symbol">₿</span>
+            </button>
+            <div class="float-layer" id="float-layer"></div>
+          </div>
+
+          <p class="mine-hint">Каждый 12-й удар — критический: ×5 токенов 💥</p>
+
+          <div class="mine-stats">
+            <div class="stat"><span>Добыто всего</span><b id="total-mined">0</b></div>
+            <div class="stat"><span>Тапов</span><b id="tap-count">0</b></div>
+            <div class="stat"><span>Критов</span><b id="crit-count">0</b></div>
+          </div>
+
+          <div class="shop-head">
+            <h3>Магазин</h3>
+            <div class="shop-tabs">
+              <button class="shop-tab active" type="button" data-shop="buffs">Бафы</button>
+              <button class="shop-tab" type="button" data-shop="collection">Коллекция</button>
+            </div>
+          </div>
+
+          <div class="shop-view active" id="shop-buffs"></div>
+          <div class="shop-view item-grid" id="shop-collection"></div>
+
+          <div class="collection-shelf">
+            <div class="shelf-title">Моя коллекция <span id="collection-count">0 / 10</span></div>
+            <div class="shelf-grid" id="shelf"></div>
+          </div>
+
+          <button class="reset small" id="mine-reset" type="button">Сбросить прогресс</button>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -89,5 +150,6 @@
 
   <script src="script.js"></script>
   <script src="player.js"></script>
+  <script src="mining.js"></script>
 </body>
 </html>
