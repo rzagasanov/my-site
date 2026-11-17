@@ -1722,6 +1722,42 @@ body {
   border-color: var(--accent);
 }
 
+.nick-modal #pass-input {
+  margin-top: 8px;
+}
+
+.nick-modal button.register {
+  margin-top: 7px;
+  color: var(--text);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.account-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.account-line button {
+  padding: 5px 9px;
+  font-family: inherit;
+  font-size: 10.5px;
+  color: #ffb3b3;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 90, 90, 0.3);
+  background: rgba(200, 40, 40, 0.1);
+  cursor: pointer;
+}
+
+.account-line button[hidden] {
+  display: none;
+}
+
 .nick-error {
   min-height: 16px;
   margin-top: 6px;

@@ -127,7 +127,11 @@
     nickInput: document.getElementById("nick-input"),
     nickError: document.getElementById("nick-error"),
     nickSave: document.getElementById("nick-save"),
+    nickRegister: document.getElementById("nick-register"),
+    passInput: document.getElementById("pass-input"),
     nickChange: document.getElementById("nick-change"),
+    accountName: document.getElementById("account-name"),
+    accountLogout: document.getElementById("account-logout"),
     topList: document.getElementById("top-list"),
     topRefresh: document.getElementById("top-refresh"),
   };
@@ -138,32 +142,37 @@
     return {
       coins: 0, total: 0, taps: 0, crits: 0,
       owned: {}, items: {}, stocks: {}, business: {},
-      market: {}, control: {}, bizUp: {}, migrated5b: true,
+      market: {}, control: {}, bizUp: {}, migrated5b: true, updated: 0,
+    };
+  }
+
+  function normalizeSave(saved) {
+    const base = fresh();
+    if (!saved || typeof saved !== "object") return base;
+    return {
+      coins: Number(saved.coins) || 0,
+      total: Number(saved.total) || 0,
+      taps: Number(saved.taps) || 0,
+      crits: Number(saved.crits) || 0,
+      owned: saved.owned && typeof saved.owned === "object" ? saved.owned : {},
+      items: saved.items && typeof saved.items === "object" ? saved.items : {},
+      stocks: saved.stocks && typeof saved.stocks === "object" ? saved.stocks : {},
+      business: saved.business && typeof saved.business === "object" ? saved.business : {},
+      market: saved.market && typeof saved.market === "object" ? saved.market : {},
+      control: saved.control && typeof saved.control === "object" ? saved.control : {},
+      bizUp: saved.bizUp && typeof saved.bizUp === "object" ? saved.bizUp : {},
+      migrated5b: saved.migrated5b === true,
+      updated: Number(saved.updated) || 0,
     };
   }
 
   const PEOPLE_CONFISCATE = ["fedya", "adilet", "rza", "sabir", "vugar"];
 
   function load() {
-    const base = fresh();
     try {
       const raw = localStorage.getItem(KEY);
-      if (!raw) return base;
-      const saved = JSON.parse(raw);
-      const result = {
-        coins: Number(saved.coins) || 0,
-        total: Number(saved.total) || 0,
-        taps: Number(saved.taps) || 0,
-        crits: Number(saved.crits) || 0,
-        owned: saved.owned && typeof saved.owned === "object" ? saved.owned : {},
-        items: saved.items && typeof saved.items === "object" ? saved.items : {},
-        stocks: saved.stocks && typeof saved.stocks === "object" ? saved.stocks : {},
-        business: saved.business && typeof saved.business === "object" ? saved.business : {},
-        market: saved.market && typeof saved.market === "object" ? saved.market : {},
-        control: saved.control && typeof saved.control === "object" ? saved.control : {},
-        bizUp: saved.bizUp && typeof saved.bizUp === "object" ? saved.bizUp : {},
-        migrated5b: saved.migrated5b === true,
-      };
+      if (!raw) return fresh();
+      const result = normalizeSave(JSON.parse(raw));
       // Разовая конфискация 5 людей: изначально они стоили слишком дёшево.
       // Дальше не повторяется — купленные заново останутся.
       if (!result.migrated5b) {
@@ -179,7 +188,7 @@
       }
       return result;
     } catch (error) {
-      return base;
+      return fresh();
     }
   }
 
@@ -190,7 +199,10 @@
   const TOP_URL = "https://mantledb.sh/v2/rzagasanov-mining-top/leaderboard";
   const NICK_KEY = "mineNick_v1";
   const PLAYER_KEY = "minePlayerId_v1";
+  const ACCOUNT_KEY = "mineAccount_v1";
+  const ACCOUNT_BASE = "https://mantledb.sh/v2/rzagasanov-acc-";
   let publishTimer = 0;
+  let accountTimer = 0;
   let topData = {};
 
   function storeGet(key) {
@@ -206,6 +218,18 @@
   }
   let nick = storeGet(NICK_KEY) || "";
 
+  function loadSession() {
+    try {
+      const raw = storeGet(ACCOUNT_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      return data && data.nick && data.key ? data : null;
+    } catch (error) {
+      return null;
+    }
+  }
+  let session = loadSession();
+
   const stockPrices = {};
   const stockPrev = {};
   const qtyDraft = {};
@@ -219,12 +243,14 @@
   });
 
   function saveNow() {
+    save.updated = Date.now();
     try {
       localStorage.setItem(KEY, JSON.stringify(save));
     } catch (error) {
       /* приватный режим — просто не сохраняем */
     }
     schedulePublish();
+    scheduleAccountPush();
   }
 
   function saveSoon() {
@@ -1039,42 +1065,233 @@
     }, 6000);
   }
 
-  function showNickModal(change) {
-    el.nickInput.value = change ? nick : "";
+  // ===== Аккаунт: ник + пароль, прогресс в облаке =====
+  function accountKey(name) {
+    return name.trim().replace(/\s+/g, "_").toLowerCase();
+  }
+
+  function accountUrl(name) {
+    const key = accountKey(name);
+    const shard = /^[a-z0-9]/.test(key) ? key[0] : "other";
+    return ACCOUNT_BASE + shard + "/" + encodeURIComponent(key);
+  }
+
+  async function accountRead(name) {
+    const response = await fetch(accountUrl(name), { cache: "no-store" });
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    return await response.json();
+  }
+
+  async function accountWrite(name, record) {
+    const response = await fetch(accountUrl(name), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record),
+    });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+  }
+
+  function randomHex(length) {
+    const bytes = new Uint8Array(length);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function deriveKey(password, salt) {
+    const data = new TextEncoder().encode(salt + ":" + password);
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  function updateAccountUI() {
+    el.accountName.textContent = session ? "👤 " + session.nick : "👤 Гость";
+    el.accountLogout.hidden = !session;
+  }
+
+  function showAuthModal(prefill) {
+    el.nickInput.value = prefill || nick || "";
+    el.passInput.value = "";
     el.nickError.textContent = "";
     el.nickOverlay.classList.add("show");
     el.nickOverlay.setAttribute("aria-hidden", "false");
     setTimeout(() => el.nickInput.focus(), 60);
   }
 
-  function saveNick() {
-    const value = el.nickInput.value.trim().replace(/\s+/g, " ").slice(0, 16);
-    if (value.length < 2) {
-      el.nickError.textContent = "Напиши ник — хотя бы 2 буквы";
-      return;
-    }
-    nick = value;
-    storeSet(NICK_KEY, nick);
+  function closeAuthModal() {
     el.nickOverlay.classList.remove("show");
     el.nickOverlay.setAttribute("aria-hidden", "true");
-    topPublish();
   }
 
-  el.nickSave.addEventListener("click", saveNick);
+  function applySession(name, key, salt, id) {
+    session = { nick: name, key: key, salt: salt, playerId: id };
+    storeSet(ACCOUNT_KEY, JSON.stringify(session));
+    nick = name;
+    playerId = id;
+    storeSet(NICK_KEY, nick);
+    storeSet(PLAYER_KEY, playerId);
+    updateAccountUI();
+  }
+
+  function readCredentials() {
+    return {
+      name: el.nickInput.value.trim().replace(/\s+/g, " ").slice(0, 16),
+      pass: el.passInput.value,
+    };
+  }
+
+  async function registerAccount() {
+    const { name, pass } = readCredentials();
+    if (name.length < 2) {
+      el.nickError.textContent = "Ник — хотя бы 2 буквы";
+      return;
+    }
+    if (pass.length < 4) {
+      el.nickError.textContent = "Пароль — хотя бы 4 символа";
+      return;
+    }
+    if (!crypto || !crypto.subtle) {
+      el.nickError.textContent = "Браузер не поддерживает защищённый вход";
+      return;
+    }
+    el.nickError.textContent = "Проверяю ник…";
+    try {
+      if (await accountRead(name)) {
+        el.nickError.textContent = "Такой ник уже есть — нажми «Войти»";
+        return;
+      }
+      const salt = randomHex(16);
+      const key = await deriveKey(pass, salt);
+      const id = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      await accountWrite(name, { nick: name, key: key, salt: salt, playerId: id, save: save, updated: Date.now() });
+      applySession(name, key, salt, id);
+      closeAuthModal();
+      saveNow();
+      renderAll();
+      topPublish();
+    } catch (error) {
+      el.nickError.textContent = "Не удалось создать аккаунт — попробуй ещё раз";
+    }
+  }
+
+  async function loginAccount() {
+    const { name, pass } = readCredentials();
+    if (name.length < 2 || !pass) {
+      el.nickError.textContent = "Введи ник и пароль";
+      return;
+    }
+    if (!crypto || !crypto.subtle) {
+      el.nickError.textContent = "Браузер не поддерживает защищённый вход";
+      return;
+    }
+    el.nickError.textContent = "Проверяю…";
+    try {
+      const record = await accountRead(name);
+      if (!record) {
+        el.nickError.textContent = "Аккаунт не найден — создай его";
+        return;
+      }
+      const key = await deriveKey(pass, record.salt || "");
+      if (key !== record.key) {
+        el.nickError.textContent = "Неверный пароль";
+        return;
+      }
+      applySession(record.nick || name, key, record.salt || "", record.playerId || playerId);
+      save = normalizeSave(record.save);
+      saveNow();
+      closeAuthModal();
+      renderAll();
+      topPublish();
+    } catch (error) {
+      el.nickError.textContent = "Нет связи с аккаунтом — попробуй позже";
+    }
+  }
+
+  async function accountPull() {
+    if (!session) return;
+    try {
+      const record = await accountRead(session.nick);
+      if (!record || record.key !== session.key) return;
+      const incoming = normalizeSave(record.save);
+      if (incoming.updated > Number(save.updated || 0)) {
+        save = incoming;
+        saveNow();
+        renderAll();
+      }
+      if (record.playerId) playerId = record.playerId;
+      nick = record.nick || session.nick;
+    } catch (error) {
+      /* офлайн — играем с локальной копией */
+    }
+  }
+
+  async function accountPush() {
+    if (!session) return;
+    try {
+      await accountWrite(session.nick, {
+        nick: session.nick,
+        key: session.key,
+        salt: session.salt,
+        playerId: playerId,
+        save: save,
+        updated: Date.now(),
+      });
+    } catch (error) {
+      /* офлайн — повторим позже */
+    }
+  }
+
+  function scheduleAccountPush() {
+    if (!session || accountTimer) return;
+    accountTimer = setTimeout(() => {
+      accountTimer = 0;
+      accountPush();
+    }, 6000);
+  }
+
+  function logoutAccount() {
+    storeSet(ACCOUNT_KEY, "");
+    session = null;
+    nick = "";
+    playerId = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    storeSet(PLAYER_KEY, playerId);
+    updateAccountUI();
+    showAuthModal();
+  }
+
+  el.nickSave.addEventListener("click", loginAccount);
+  el.nickRegister.addEventListener("click", registerAccount);
   el.nickInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") saveNick();
+    if (event.key === "Enter") loginAccount();
   });
-  el.nickChange.addEventListener("click", () => showNickModal(true));
+  el.passInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") loginAccount();
+  });
+  el.nickChange.addEventListener("click", () => showAuthModal(nick));
+  el.accountLogout.addEventListener("click", logoutAccount);
   el.topRefresh.addEventListener("click", () => {
     topRefresh();
     topPublish();
   });
 
-  if (!nick) showNickModal(false);
-  else topRefresh();
+  if (session) {
+    updateAccountUI();
+    accountPull().then(() => {
+      renderAll();
+      topRefresh();
+      topPublish();
+    });
+  } else {
+    showAuthModal();
+    topRefresh();
+  }
 
   setInterval(() => {
     if (nick) topPublish();
+  }, 30000);
+
+  setInterval(() => {
+    if (session) accountPush();
   }, 30000);
 
   renderAll();

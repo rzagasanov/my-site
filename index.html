@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Моя страница — игры и музыка</title>
   <meta name="description" content="Фото, любимая музыка, крестики-нолики и майнинг токенов.">
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
   <main class="page">
@@ -137,7 +137,11 @@
               <button id="top-refresh" type="button" aria-label="Обновить топ">⟳ Обновить</button>
             </div>
             <div class="top-list" id="top-list">Загрузка…</div>
-            <button class="nick-change" id="nick-change" type="button">✏️ Сменить ник</button>
+            <div class="account-line">
+              <span id="account-name">👤 Гость</span>
+              <button id="account-logout" type="button" hidden>Выйти</button>
+            </div>
+            <button class="nick-change" id="nick-change" type="button">🔄 Другой аккаунт</button>
           </div>
 
           <div class="shop-head">
@@ -182,12 +186,14 @@
 
   <div class="nick-overlay" id="nick-overlay" aria-hidden="true">
     <div class="nick-modal">
-      <h2>👋 Давай знакомиться</h2>
-      <p>Напиши ник — он будет показан в общем топе по состоянию.</p>
-      <input id="nick-input" type="text" maxlength="16" autocomplete="off" placeholder="Например, Рза" aria-label="Твой ник">
+      <h2>🔐 Вход в аккаунт</h2>
+      <p>Ник и пароль — прогресс будет на любом устройстве.</p>
+      <input id="nick-input" type="text" maxlength="16" autocomplete="username" placeholder="Ник" aria-label="Ник">
+      <input id="pass-input" type="password" maxlength="64" autocomplete="current-password" placeholder="Пароль" aria-label="Пароль">
       <div class="nick-error" id="nick-error"></div>
-      <button id="nick-save" type="button">Войти в игру</button>
-      <small>Ник сохранится на этом устройстве. Его можно поменять в блоке «Топ».</small>
+      <button id="nick-save" type="button">Войти</button>
+      <button id="nick-register" class="register" type="button">Создать аккаунт</button>
+      <small>Пароль хранится только в виде защищённого отпечатка. При входе на другом устройстве введи тот же ник и пароль.</small>
     </div>
   </div>
 
@@ -198,8 +204,8 @@
     </div>
   </div>
 
-  <script src="script.js?v=9"></script>
-  <script src="player.js?v=9"></script>
-  <script src="mining.js?v=9"></script>
+  <script src="script.js?v=10"></script>
+  <script src="player.js?v=10"></script>
+  <script src="mining.js?v=10"></script>
 </body>
 </html>
